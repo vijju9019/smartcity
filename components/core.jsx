@@ -38,6 +38,8 @@ export const Stack = createStackNavigator();
 export const AppContext = React.createContext({});
 export const AppProvider = ({ children }) => {
   const [role, setRole] = useState('resident');
+  const [userName, setUserName] = useState('Kshitij Dinni');
+  const [userEmail, setUserEmail] = useState('kshitijdinni6605@gmail.com');
   const [darkMode, setDarkMode] = useState(true);
   const theme = useMemo(() => ({
     bg: darkMode ? BG : '#F1F5F9',
@@ -47,7 +49,7 @@ export const AppProvider = ({ children }) => {
     border: darkMode ? BORDER : 'rgba(0,0,0,0.08)',
     glass: darkMode ? GLASS : 'rgba(255,255,255,0.85)',
   }), [darkMode]);
-  const value = useMemo(() => ({ role, setRole, darkMode, setDarkMode, theme }), [role, darkMode, theme]);
+  const value = useMemo(() => ({ role, setRole, userName, setUserName, userEmail, setUserEmail, darkMode, setDarkMode, theme }), [role, userName, userEmail, darkMode, theme]);
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
 export const useApp = () => useContext(AppContext);
@@ -124,6 +126,30 @@ export const getStatusLabel = (s) => {
 };
 export const getCategoryInfo = (id) => CATEGORIES.find(c => c.id === id) || CATEGORIES[CATEGORIES.length - 1];
 export const generateId = () => 'c_' + Date.now() + '_' + Math.floor(Math.random() * 9999);
+
+export const getAreaAuthority = (location = '') => {
+  const loc = location.toLowerCase();
+  if (loc.includes('bellandur') || loc.includes('block a') || loc.includes('gate 2')) {
+    return { ward: 'Ward 152 (Bellandur)', mla: 'Hon. Manjula S.', municipality: 'BBMP (East)' };
+  }
+  if (loc.includes('mahadevapura') || loc.includes('whitefield') || loc.includes('main avenue')) {
+    return { ward: 'Ward 150 (Mahadevapura)', mla: 'Hon. Aravind Limbavali', municipality: 'BBMP (East)' };
+  }
+  if (loc.includes('hsr') || loc.includes('sector')) {
+    return { ward: 'Ward 174 (HSR Layout)', mla: 'Hon. Satish Reddy', municipality: 'BBMP (South)' };
+  }
+  if (loc.includes('koramangala') || loc.includes('block d')) {
+    return { ward: 'Ward 151 (Koramangala)', mla: 'Hon. Ramalinga Reddy', municipality: 'BBMP (South)' };
+  }
+  if (loc.includes('indiranagar')) {
+    return { ward: 'Ward 80 (Hoysala Nagar)', mla: 'Hon. S. Raghu', municipality: 'BBMP (East)' };
+  }
+  if (loc.includes('hebbal')) {
+    return { ward: 'Ward 22 (Hebbal)', mla: 'Hon. Suresh B. S.', municipality: 'BBMP (North)' };
+  }
+  // Default fallback for Bengaluru
+  return { ward: 'Ward 152 (Central)', mla: 'Hon. Dr. Satish Kumar', municipality: 'BBMP (Bengaluru)' };
+};
 
 // ─── AI Analyzer ──────────────────────────────────────────────────────────────
 export const analyzeComplaintAI = (title, description, category) => {

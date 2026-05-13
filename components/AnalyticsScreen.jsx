@@ -34,7 +34,7 @@ export default function AnalyticsScreen({ navigation }) {
         </TouchableOpacity>
         <Text style={{ color: TEXT, fontSize: 18, fontWeight: 'bold' }}>Analytics</Text>
       </View>
-      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, paddingBottom: 60 }} showsVerticalScrollIndicator={true}>
         <View style={{ flexDirection: 'row', marginBottom: 12 }}>
           <StatCard icon="assessment" value={total} label="Total Complaints" accent={PRIMARY} />
           <StatCard icon="trending-up" value={resRate + '%'} label="Resolution Rate" accent={SUCCESS} trend={5} />

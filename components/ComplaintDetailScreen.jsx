@@ -7,7 +7,7 @@ import { useShare } from 'platform-hooks';
 import {
   PRIMARY, ACCENT, BG, CARD, SUCCESS, WARNING, DANGER, SECONDARY, TEXT, TEXT2, BORDER,
   SEED_COMPLAINTS, WORKERS, HEADER_HEIGHT,
-  getCategoryInfo, getPriorityColor, getStatusColor, getStatusLabel, formatTime,
+  getCategoryInfo, getPriorityColor, getStatusColor, getStatusLabel, formatTime, getAreaAuthority,
 } from './core';
 
 export default function ComplaintDetailScreen({ navigation, route }) {
@@ -27,6 +27,7 @@ export default function ComplaintDetailScreen({ navigation, route }) {
     complaint.status === 'resolved' ? { icon: 'check-circle', color: SUCCESS, label: 'Issue Resolved', time: complaint.updated_at + 3600000, desc: complaint.resolution_notes || 'Issue has been resolved.' } : null,
   ].filter(Boolean);
 
+  const authority = getAreaAuthority(complaint.location);
   const worker = WORKERS.find(w => w.id === complaint.worker_id);
   const scrollH = Dimensions.get('window').height - insets.top - 60;
 
@@ -79,6 +80,52 @@ export default function ComplaintDetailScreen({ navigation, route }) {
             </View>
           )}
         </View>
+        {/* Local Authority Details */}
+        <View style={{ backgroundColor: CARD, borderRadius: 16, padding: 18, marginBottom: 16, borderWidth: 1, borderColor: PRIMARY + '44' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 14 }}>
+            <MaterialIcons name="account-balance" size={22} color={PRIMARY} />
+            <Text style={{ color: TEXT, fontSize: 16, fontWeight: 'bold', marginLeft: 10 }}>Local Authority Details</Text>
+          </View>
+          
+          <View style={{ marginBottom: 12 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+              <Text style={{ color: TEXT2, fontSize: 13 }}>Constituency MLA</Text>
+              <Text style={{ color: TEXT, fontSize: 13, fontWeight: '600' }}>{authority.mla}</Text>
+            </View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+              <Text style={{ color: TEXT2, fontSize: 13 }}>Municipality</Text>
+              <Text style={{ color: TEXT, fontSize: 13, fontWeight: '600' }}>{authority.municipality}</Text>
+            </View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+              <Text style={{ color: TEXT2, fontSize: 13 }}>Department</Text>
+              <Text style={{ color: PRIMARY, fontSize: 13, fontWeight: 'bold' }}>{catInfo.label} Department</Text>
+            </View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Text style={{ color: TEXT2, fontSize: 13 }}>Ward No</Text>
+              <Text style={{ color: TEXT, fontSize: 13, fontWeight: '600' }}>{authority.ward}</Text>
+            </View>
+          </View>
+
+          <TouchableOpacity 
+            onPress={() => {
+              const url = 'https://sahaya.bbmp.gov.in/';
+              if (Platform.OS === 'web') {
+                window.open(url, '_blank');
+              } else {
+                import('react-native').then(({ Linking }) => {
+                  Linking.openURL(url).catch(() => Alert.alert('Error', 'Could not open the portal.'));
+                });
+              }
+            }}
+            style={{ backgroundColor: BG, borderRadius: 10, paddingVertical: 10, alignItems: 'center', borderWidth: 1, borderColor: PRIMARY + '44', marginTop: 4 }}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <MaterialIcons name="open-in-new" size={16} color={PRIMARY} style={{ marginRight: 6 }} />
+              <Text style={{ color: PRIMARY, fontSize: 13, fontWeight: 'bold' }}>Connect to Area Municipality</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+
         {/* Worker card */}
         {worker && (
           <View style={{ backgroundColor: CARD, borderRadius: 14, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: BORDER, flexDirection: 'row', alignItems: 'center' }}>

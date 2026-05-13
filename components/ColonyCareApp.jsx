@@ -18,9 +18,42 @@ import AdminDashboardScreen from './AdminDashboardScreen';
 import AnalyticsScreen from './AnalyticsScreen';
 import MapViewScreen from './MapViewScreen';
 import NotificationsScreen from './NotificationsScreen';
+import SignupScreen from './SignupScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
+
+if (Platform.OS === 'web' && typeof document !== 'undefined') {
+  const style = document.createElement('style');
+  style.textContent = `
+    html, body, #root, [data-reactroot] {
+      height: 100% !important;
+      overflow-y: auto !important;
+      background-color: ${BG};
+    }
+    .react-navigation-container, 
+    .react-navigation-container > div, 
+    .react-navigation-container > div > div {
+      overflow: visible !important;
+      height: auto !important;
+    }
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: ${BG};
+    }
+    ::-webkit-scrollbar-thumb {
+      background: ${BORDER};
+      border-radius: 5px;
+      border: 2px solid ${BG};
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: ${PRIMARY}88;
+    }
+  `;
+  document.head.appendChild(style);
+}
 
 function TabNavigator() {
   const insets = useSafeAreaInsets();
@@ -29,7 +62,8 @@ function TabNavigator() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          position: 'absolute', bottom: 0,
+          position: 'absolute',
+          bottom: 0,
           height: Platform.OS === 'web' ? TAB_MENU_HEIGHT : TAB_MENU_HEIGHT + insets.bottom,
           borderTopWidth: 1, borderTopColor: BORDER, backgroundColor: CARD,
           elevation: 20, shadowColor: '#000', shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.3, shadowRadius: 12,
@@ -60,7 +94,8 @@ function AppNavigator() {
   return (
     <AppProvider>
       <StatusBar barStyle="light-content" backgroundColor={BG} />
-      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="MainApp">
+      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Signup">
+        <Stack.Screen name="Signup" component={SignupScreen} />
         <Stack.Screen name="MainApp" component={TabNavigator} />
         <Stack.Screen name="RaiseComplaint" component={RaiseComplaintScreen} />
         <Stack.Screen name="ComplaintDetail" component={ComplaintDetailScreen} initialParams={{ complaintId: null }} />
@@ -75,12 +110,14 @@ function AppNavigator() {
 
 export default function ColonyCareApp() {
   return (
-    <SafeAreaProvider>
-      <NavigationIndependentTree>
-        <NavigationContainer>
-          <AppNavigator />
-        </NavigationContainer>
-      </NavigationIndependentTree>
+    <SafeAreaProvider style={{ flex: 1 }}>
+      <View style={{ flex: 1, backgroundColor: BG }}>
+        <NavigationIndependentTree>
+          <NavigationContainer>
+            <AppNavigator />
+          </NavigationContainer>
+        </NavigationIndependentTree>
+      </View>
     </SafeAreaProvider>
   );
 }

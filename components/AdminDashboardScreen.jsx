@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert, Platform, Dimensions } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Alert, Platform, Dimensions, TextInput } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuery, useMutation } from 'platform-hooks';
@@ -31,6 +31,27 @@ export default function AdminDashboardScreen({ navigation }) {
       .catch(e => { Platform.OS === 'web' ? alert(e.message) : Alert.alert('Error', e.message); });
   }, [updateComplaint]);
 
+  const [newWorker, setNewWorker] = React.useState({ name: '', dept: '' });
+  const [newResident, setNewResident] = React.useState({ name: '', unit: '' });
+
+  const handleAddWorker = () => {
+    if (!newWorker.name || !newWorker.dept) {
+      Platform.OS === 'web' ? alert('Please fill all fields') : Alert.alert('Error', 'Please fill all fields');
+      return;
+    }
+    Platform.OS === 'web' ? alert(`Worker ${newWorker.name} added!`) : Alert.alert('Success', `Worker ${newWorker.name} added.`);
+    setNewWorker({ name: '', dept: '' });
+  };
+
+  const handleAddResident = () => {
+    if (!newResident.name || !newResident.unit) {
+      Platform.OS === 'web' ? alert('Please fill all fields') : Alert.alert('Error', 'Please fill all fields');
+      return;
+    }
+    Platform.OS === 'web' ? alert(`Resident ${newResident.name} added!`) : Alert.alert('Success', `Resident ${newResident.name} added.`);
+    setNewResident({ name: '', unit: '' });
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: BG }}>
       <View style={{ paddingTop: insets.top + 8, paddingBottom: 14, paddingHorizontal: 20, backgroundColor: BG, borderBottomWidth: 1, borderBottomColor: BORDER, flexDirection: 'row', alignItems: 'center' }}>
@@ -45,7 +66,7 @@ export default function AdminDashboardScreen({ navigation }) {
           <MaterialIcons name="bar-chart" size={22} color={ACCENT} />
         </TouchableOpacity>
       </View>
-      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, paddingBottom: 60 }} showsVerticalScrollIndicator={true}>
         <View style={{ flexDirection: 'row', marginBottom: 12 }}>
           <StatCard icon="report-problem" value={stats.total} label="Total" accent={PRIMARY} />
           <StatCard icon="pending" value={stats.pending} label="Pending" accent={WARNING} />
@@ -56,10 +77,70 @@ export default function AdminDashboardScreen({ navigation }) {
           <StatCard icon="priority-high" value={stats.critical} label="Critical" accent={DANGER} />
           <StatCard icon="people" value={5} label="Workers" accent={ACCENT} />
         </View>
+        
         <View style={{ backgroundColor: CARD, borderRadius: 16, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: BORDER }}>
           <Text style={{ color: TEXT, fontSize: 15, fontWeight: '700', marginBottom: 4 }}>Category Breakdown</Text>
           <MiniBarChart data={catChartData} height={80} />
         </View>
+
+        {/* Admin Management Section */}
+        <Text style={{ color: TEXT, fontSize: 16, fontWeight: 'bold', marginBottom: 12 }}>Community Management</Text>
+        <View style={{ flexDirection: 'row', marginBottom: 16 }}>
+          {/* Add Worker */}
+          <View style={{ flex: 1, backgroundColor: CARD, borderRadius: 16, padding: 14, marginRight: 8, borderWidth: 1, borderColor: BORDER }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+              <View style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: SUCCESS + '22', justifyContent: 'center', alignItems: 'center', marginRight: 8 }}>
+                <MaterialIcons name="person-add" size={18} color={SUCCESS} />
+              </View>
+              <Text style={{ color: TEXT, fontSize: 14, fontWeight: '700' }}>Add Worker</Text>
+            </View>
+            <TextInput 
+              placeholder="Name" 
+              placeholderTextColor={TEXT2 + '88'} 
+              value={newWorker.name}
+              onChangeText={(t) => setNewWorker({...newWorker, name: t})}
+              style={{ backgroundColor: BG, borderRadius: 8, padding: 8, color: TEXT, fontSize: 12, marginBottom: 8, borderWidth: 1, borderColor: BORDER }} 
+            />
+            <TextInput 
+              placeholder="Department" 
+              placeholderTextColor={TEXT2 + '88'} 
+              value={newWorker.dept}
+              onChangeText={(t) => setNewWorker({...newWorker, dept: t})}
+              style={{ backgroundColor: BG, borderRadius: 8, padding: 8, color: TEXT, fontSize: 12, marginBottom: 12, borderWidth: 1, borderColor: BORDER }} 
+            />
+            <TouchableOpacity onPress={handleAddWorker} style={{ backgroundColor: SUCCESS, borderRadius: 8, paddingVertical: 8, alignItems: 'center' }}>
+              <Text style={{ color: '#fff', fontSize: 12, fontWeight: 'bold' }}>Add</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Add Resident */}
+          <View style={{ flex: 1, backgroundColor: CARD, borderRadius: 16, padding: 14, marginLeft: 8, borderWidth: 1, borderColor: BORDER }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+              <View style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: PRIMARY + '22', justifyContent: 'center', alignItems: 'center', marginRight: 8 }}>
+                <MaterialIcons name="group-add" size={18} color={PRIMARY} />
+              </View>
+              <Text style={{ color: TEXT, fontSize: 14, fontWeight: '700' }}>Add Member</Text>
+            </View>
+            <TextInput 
+              placeholder="Name" 
+              placeholderTextColor={TEXT2 + '88'} 
+              value={newResident.name}
+              onChangeText={(t) => setNewResident({...newResident, name: t})}
+              style={{ backgroundColor: BG, borderRadius: 8, padding: 8, color: TEXT, fontSize: 12, marginBottom: 8, borderWidth: 1, borderColor: BORDER }} 
+            />
+            <TextInput 
+              placeholder="Unit/Block" 
+              placeholderTextColor={TEXT2 + '88'} 
+              value={newResident.unit}
+              onChangeText={(t) => setNewResident({...newResident, unit: t})}
+              style={{ backgroundColor: BG, borderRadius: 8, padding: 8, color: TEXT, fontSize: 12, marginBottom: 12, borderWidth: 1, borderColor: BORDER }} 
+            />
+            <TouchableOpacity onPress={handleAddResident} style={{ backgroundColor: PRIMARY, borderRadius: 8, paddingVertical: 8, alignItems: 'center' }}>
+              <Text style={{ color: '#fff', fontSize: 12, fontWeight: 'bold' }}>Add</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
         <Text style={{ color: TEXT, fontSize: 16, fontWeight: 'bold', marginBottom: 12 }}>Worker Status</Text>
         <View style={{ backgroundColor: CARD, borderRadius: 16, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: BORDER }}>
           {WORKERS.map((w, i) => (

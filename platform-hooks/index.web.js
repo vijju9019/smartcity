@@ -123,30 +123,43 @@ function useShare() {
 function useMaps(initialRegion) {
   const defaultRegion = initialRegion || { latitude: 12.9716, longitude: 77.5946, latitudeDelta: 0.03, longitudeDelta: 0.03 };
   const [region, setRegion] = useState(defaultRegion);
-  const mapRef = { current: null };
+  const mapRef = useRef(null);
 
-  // Web fallback: Just a placeholder view
-  const MockMap = function({ style, children }) {
+  // Web implementation: Real Google Maps Embed
+  const GoogleMap = function({ style, children }) {
+    // If a search query is provided in the region object, use it for the map search
+    const query = region.searchQuery ? encodeURIComponent(region.searchQuery) : `${region.latitude},${region.longitude}`;
+    const searchUrl = `https://maps.google.com/maps?q=${query}&z=19&t=k&output=embed`;
+
     return (
-      <View style={[{ backgroundColor: '#222', justifyContent: 'center', alignItems: 'center' }, style]}>
-        <Text style={{ color: '#666' }}>Map View Mock (Web)</Text>
+      <View style={[{ backgroundColor: '#f0f0f0', overflow: 'hidden' }, style]}>
+        {Platform.OS === 'web' ? (
+          <iframe 
+            width="100%" 
+            height="100%" 
+            frameBorder="0" 
+            style={{ border: 0 }} 
+            src={searchUrl} 
+            allowFullScreen
+          />
+        ) : (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text>Native Map Component Placeholder</Text>
+          </View>
+        )}
         {children}
       </View>
     );
   };
 
-  const MockMarker = function({ coordinate, title, description, children }) {
-    return (
-      <View style={{ position: 'absolute', top: '50%', left: '50%' }}>
-        <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: 'red' }} />
-        {children}
-      </View>
-    );
+  const GoogleMarker = function({ coordinate, title, description, children }) {
+    // Markers are hard to do with an iframe embed without API, so we'll just show the center point
+    return null;
   };
 
   return { 
-    MapView: MockMap, 
-    Marker: MockMarker, 
+    MapView: GoogleMap, 
+    Marker: GoogleMarker, 
     mapRef: mapRef, 
     region: region, 
     setRegion: setRegion, 

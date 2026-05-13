@@ -8,7 +8,7 @@ import {
   CATEGORIES, HEADER_HEIGHT, analyzeComplaintAI, generateId, getPriorityColor,
 } from './core';
 
-export default function RaiseComplaintScreen({ navigation }) {
+export default function RaiseComplaintScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -26,6 +26,14 @@ export default function RaiseComplaintScreen({ navigation }) {
   const { getCurrentLocation } = useLocation();
   const { pickDocument, lastFile, isLoading: fpLoading } = useFilePicker();
   const { mutate } = useMutation('complaints', 'insert');
+
+  React.useEffect(() => {
+    if (route.params?.lat && route.params?.lng) {
+      setLat(route.params.lat);
+      setLng(route.params.lng);
+      setLocation(route.params.lat.toFixed(6) + ', ' + route.params.lng.toFixed(6));
+    }
+  }, [route.params]);
 
   React.useEffect(() => { if (cameraPhoto) setPhoto(cameraPhoto.uri); }, [cameraPhoto]);
 
@@ -70,8 +78,12 @@ export default function RaiseComplaintScreen({ navigation }) {
           <MaterialIcons name="psychology" size={18} color={ACCENT} />
         </View>
       </View>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+      <KeyboardAvoidingView 
+        style={{ flex: 1 }} 
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        enabled={Platform.OS !== 'web'}
+      >
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: 60 }} showsVerticalScrollIndicator={true}>
           <Text style={{ color: TEXT2, fontSize: 13, marginBottom: 6 }}>Complaint Title *</Text>
           <TextInput value={title} onChangeText={setTitle} placeholder="e.g. Burst water pipe near Block A" placeholderTextColor={TEXT2} style={{ backgroundColor: CARD, borderRadius: 12, padding: 14, color: TEXT, fontSize: 14, borderWidth: 1, borderColor: BORDER, marginBottom: 16 }} autoCapitalize="sentences" />
           <Text style={{ color: TEXT2, fontSize: 13, marginBottom: 10 }}>Category *</Text>

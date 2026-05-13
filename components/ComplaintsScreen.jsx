@@ -39,7 +39,16 @@ export default function ComplaintsScreen({ navigation }) {
   return (
     <View style={{ flex: 1, backgroundColor: theme.bg }}>
       <View style={{ paddingTop: insets.top + 12, paddingBottom: 14, paddingHorizontal: 20, backgroundColor: theme.bg, borderBottomWidth: 1, borderBottomColor: BORDER }}>
-        <Text style={{ color: TEXT, fontSize: 20, fontWeight: 'bold', marginBottom: 12 }}>My Complaints</Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <Text style={{ color: TEXT, fontSize: 20, fontWeight: 'bold' }}>My Complaints</Text>
+          <TouchableOpacity 
+            onPress={() => navigation.navigate('MapView')}
+            style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: PRIMARY + '22', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, borderWidth: 1, borderColor: PRIMARY + '44' }}
+          >
+            <MaterialIcons name="map" size={18} color={PRIMARY} />
+            <Text style={{ color: PRIMARY, fontSize: 13, fontWeight: 'bold', marginLeft: 6 }}>Map View</Text>
+          </TouchableOpacity>
+        </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: CARD, borderRadius: 12, paddingHorizontal: 14, borderWidth: 1, borderColor: BORDER }}>
           <MaterialIcons name="search" size={20} color={TEXT2} />
           <TextInput value={search} onChangeText={setSearch} placeholder="Search complaints..." placeholderTextColor={TEXT2} style={{ flex: 1, paddingVertical: 12, paddingLeft: 10, color: TEXT, fontSize: 14 }} />

@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Platform } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Platform, TextInput, Alert } from 'react-native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuery } from 'platform-hooks';
@@ -14,6 +14,7 @@ export default function HomeScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const appCtx = useApp();
   const { theme } = appCtx;
+  const [adminTab, setAdminTab] = useState('worker');
   const complaintsQ = useQuery('complaints');
   const complaints = useMemo(() => (complaintsQ.data?.length > 0 ? complaintsQ.data : SEED_COMPLAINTS), [complaintsQ.data]);
   const stats = useMemo(() => {
@@ -57,7 +58,118 @@ export default function HomeScreen({ navigation }) {
           </TouchableOpacity>
         </View>
       </View>
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: 20, paddingBottom: scrollBottom, paddingHorizontal: 16 }} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: 20, paddingBottom: scrollBottom, paddingHorizontal: 16 }} showsVerticalScrollIndicator={true}>
+        {/* Profile Panel */}
+        <TouchableOpacity 
+          onPress={() => navigation.navigate('Profile')}
+          style={{ backgroundColor: CARD, borderRadius: 20, padding: 16, marginBottom: 20, borderWidth: 1, borderColor: BORDER, flexDirection: 'row', alignItems: 'center' }}
+        >
+          <View style={{ width: 50, height: 50, borderRadius: 25, backgroundColor: PRIMARY + '22', justifyContent: 'center', alignItems: 'center', marginRight: 15, borderWidth: 1, borderColor: PRIMARY + '44' }}>
+            <MaterialIcons name="person" size={28} color={PRIMARY} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={{ color: TEXT, fontSize: 16, fontWeight: 'bold' }}>{appCtx.userName}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
+              <MaterialIcons name="verified" size={14} color={WARNING} />
+              <Text style={{ color: TEXT2, fontSize: 12, marginLeft: 4 }}>{appCtx.role.charAt(0).toUpperCase() + appCtx.role.slice(1)} · Block A, Unit 204</Text>
+            </View>
+          </View>
+          <MaterialIcons name="chevron-right" size={24} color={TEXT2} />
+        </TouchableOpacity>
+
+        {/* Admin Management Section */}
+        {appCtx.role === 'admin' && (
+          <View style={{ marginBottom: 24, backgroundColor: CARD, borderRadius: 20, padding: 18, borderWidth: 1, borderColor: PRIMARY + '44' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: PRIMARY + '22', justifyContent: 'center', alignItems: 'center', marginRight: 10 }}>
+                  <MaterialIcons name="admin-panel-settings" size={20} color={PRIMARY} />
+                </View>
+                <Text style={{ color: TEXT, fontSize: 17, fontWeight: 'bold' }}>Admin Management</Text>
+              </View>
+              <View style={{ backgroundColor: SUCCESS + '22', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 }}>
+                <Text style={{ color: SUCCESS, fontSize: 11, fontWeight: 'bold' }}>Admin Mode</Text>
+              </View>
+            </View>
+
+            {/* Segmented Control (Switch Role Style) */}
+            <View style={{ flexDirection: 'row', backgroundColor: BG, borderRadius: 12, padding: 4, marginBottom: 18, borderWidth: 1, borderColor: BORDER }}>
+              <TouchableOpacity 
+                onPress={() => setAdminTab('worker')}
+                style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: adminTab === 'worker' ? SUCCESS : 'transparent', borderRadius: 10, paddingVertical: 10 }}
+              >
+                <MaterialIcons name="engineering" size={16} color={adminTab === 'worker' ? '#fff' : TEXT2} />
+                <Text style={{ color: adminTab === 'worker' ? '#fff' : TEXT2, fontSize: 12, fontWeight: 'bold', marginLeft: 6 }}>Workers</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                onPress={() => setAdminTab('residency')}
+                style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: adminTab === 'residency' ? PRIMARY : 'transparent', borderRadius: 10, paddingVertical: 10 }}
+              >
+                <MaterialIcons name="home" size={16} color={adminTab === 'residency' ? '#fff' : TEXT2} />
+                <Text style={{ color: adminTab === 'residency' ? '#fff' : TEXT2, fontSize: 12, fontWeight: 'bold', marginLeft: 6 }}>Residency</Text>
+              </TouchableOpacity>
+            </View>
+
+            {adminTab === 'worker' ? (
+              <View>
+                <Text style={{ color: TEXT2, fontSize: 11, fontWeight: '700', letterSpacing: 1, marginBottom: 10, textTransform: 'uppercase' }}>New Worker Details</Text>
+                <View style={{ flexDirection: 'row', marginBottom: 16 }}>
+                  <View style={{ flex: 2, marginRight: 6 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: BG, borderRadius: 10, borderWidth: 1, borderColor: BORDER, paddingHorizontal: 10 }}>
+                      <MaterialIcons name="person" size={18} color={TEXT2} />
+                      <TextInput 
+                        placeholder="Worker Name" 
+                        placeholderTextColor={TEXT2 + '66'} 
+                        style={{ flex: 1, color: TEXT, fontSize: 13, paddingVertical: 10, paddingHorizontal: 8 }}
+                      />
+                    </View>
+                  </View>
+                  <View style={{ flex: 1, marginLeft: 6 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: BG, borderRadius: 10, borderWidth: 1, borderColor: BORDER, paddingHorizontal: 10 }}>
+                      <MaterialIcons name="groups" size={18} color={TEXT2} />
+                      <TextInput 
+                        placeholder="Total" 
+                        placeholderTextColor={TEXT2 + '66'} 
+                        keyboardType="numeric"
+                        style={{ flex: 1, color: TEXT, fontSize: 13, paddingVertical: 10, paddingHorizontal: 8 }}
+                      />
+                    </View>
+                  </View>
+                </View>
+              </View>
+            ) : (
+              <View>
+                <Text style={{ color: TEXT2, fontSize: 11, fontWeight: '700', letterSpacing: 1, marginBottom: 10, textTransform: 'uppercase' }}>New Residency Members</Text>
+                <View style={{ marginBottom: 16 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: BG, borderRadius: 10, borderWidth: 1, borderColor: BORDER, paddingHorizontal: 10, marginBottom: 10 }}>
+                    <MaterialIcons name="person-add" size={18} color={TEXT2} />
+                    <TextInput 
+                      placeholder="Member Name" 
+                      placeholderTextColor={TEXT2 + '66'} 
+                      style={{ flex: 1, color: TEXT, fontSize: 13, paddingVertical: 10, paddingHorizontal: 8 }}
+                    />
+                  </View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: BG, borderRadius: 10, borderWidth: 1, borderColor: BORDER, paddingHorizontal: 10 }}>
+                    <MaterialIcons name="apartment" size={18} color={TEXT2} />
+                    <TextInput 
+                      placeholder="Block / Unit Name" 
+                      placeholderTextColor={TEXT2 + '66'} 
+                      style={{ flex: 1, color: TEXT, fontSize: 13, paddingVertical: 10, paddingHorizontal: 8 }}
+                    />
+                  </View>
+                </View>
+              </View>
+            )}
+
+            <TouchableOpacity 
+              onPress={() => { Platform.OS === 'web' ? alert(`${adminTab === 'worker' ? 'Worker' : 'Residency'} information updated!`) : Alert.alert('Success', 'Information successfully updated.'); }}
+              style={{ backgroundColor: adminTab === 'worker' ? SUCCESS : PRIMARY, borderRadius: 12, paddingVertical: 12, alignItems: 'center', shadowColor: adminTab === 'worker' ? SUCCESS : PRIMARY, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 6, elevation: 4 }}
+            >
+              <Text style={{ color: '#fff', fontSize: 14, fontWeight: 'bold' }}>{adminTab === 'worker' ? 'Add Worker' : 'Register Residency'}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
         {/* Hero */}
         <View style={{ borderRadius: 20, padding: 20, marginBottom: 20, backgroundColor: PRIMARY, overflow: 'hidden' }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
