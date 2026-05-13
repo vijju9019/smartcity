@@ -1,0 +1,139 @@
+import React, { useState, useMemo } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Alert, Platform, Dimensions } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useQuery } from 'platform-hooks';
+import { useShare } from 'platform-hooks';
+import {
+  PRIMARY, ACCENT, BG, CARD, SUCCESS, WARNING, DANGER, SECONDARY, TEXT, TEXT2, BORDER,
+  SEED_COMPLAINTS, WORKERS, HEADER_HEIGHT,
+  getCategoryInfo, getPriorityColor, getStatusColor, getStatusLabel, formatTime,
+} from './core';
+
+export default function ComplaintDetailScreen({ navigation, route }) {
+  const complaintId = route?.params?.complaintId;
+  const insets = useSafeAreaInsets();
+  const { share } = useShare();
+  const complaintsQ = useQuery('complaints');
+  const allComplaints = useMemo(() => (complaintsQ.data?.length > 0 ? complaintsQ.data : SEED_COMPLAINTS), [complaintsQ.data]);
+  const complaint = useMemo(() => (!complaintId ? SEED_COMPLAINTS[0] : allComplaints.find(c => c.id === complaintId) || SEED_COMPLAINTS[0]), [allComplaints, complaintId]);
+  const catInfo = getCategoryInfo(complaint.category);
+  const [rating, setRating] = useState(0);
+
+  const timeline = [
+    { icon: 'flag', color: PRIMARY, label: 'Complaint Submitted', time: complaint.created_at, desc: 'Complaint #' + complaint.id + ' registered.' },
+    complaint.status !== 'pending' ? { icon: 'engineering', color: SECONDARY, label: 'Worker Assigned', time: complaint.created_at + 7200000, desc: 'Worker assigned and inspection scheduled.' } : null,
+    (complaint.status === 'in_progress' || complaint.status === 'resolved') ? { icon: 'build', color: WARNING, label: 'Work In Progress', time: complaint.updated_at, desc: 'Team on-site working on the issue.' } : null,
+    complaint.status === 'resolved' ? { icon: 'check-circle', color: SUCCESS, label: 'Issue Resolved', time: complaint.updated_at + 3600000, desc: complaint.resolution_notes || 'Issue has been resolved.' } : null,
+  ].filter(Boolean);
+
+  const worker = WORKERS.find(w => w.id === complaint.worker_id);
+  const scrollH = Dimensions.get('window').height - insets.top - 60;
+
+  return (
+    <View style={{ flex: 1, backgroundColor: BG }}>
+      <View style={{ paddingTop: insets.top + 8, paddingBottom: 14, paddingHorizontal: 20, backgroundColor: BG, borderBottomWidth: 1, borderBottomColor: BORDER, flexDirection: 'row', alignItems: 'center' }}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginRight: 14 }}>
+          <MaterialIcons name="arrow-back" size={24} color={TEXT} />
+        </TouchableOpacity>
+        <Text style={{ flex: 1, color: TEXT, fontSize: 17, fontWeight: 'bold' }}>Complaint Details</Text>
+        <TouchableOpacity onPress={() => share({ message: 'Complaint: ' + complaint.title + ' - Status: ' + getStatusLabel(complaint.status), url: '' }).then(r => { if (r.error) alert(r.error); })} style={{ backgroundColor: CARD, borderRadius: 10, padding: 8 }}>
+          <MaterialIcons name="share" size={20} color={TEXT} />
+        </TouchableOpacity>
+      </View>
+      <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+        {/* Main card */}
+        <View style={{ backgroundColor: CARD, borderRadius: 16, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: BORDER, borderLeftWidth: 4, borderLeftColor: getPriorityColor(complaint.priority) }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+            <View style={{ flex: 1, marginRight: 10 }}>
+              <Text style={{ color: TEXT, fontSize: 18, fontWeight: 'bold', marginBottom: 6 }}>{complaint.title}</Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                <View style={{ backgroundColor: catInfo.color + '22', borderRadius: 6, paddingHorizontal: 10, paddingVertical: 4, marginRight: 6, marginBottom: 4, flexDirection: 'row', alignItems: 'center' }}>
+                  <MaterialIcons name={catInfo.icon} size={13} color={catInfo.color} />
+                  <Text style={{ color: catInfo.color, fontSize: 12, marginLeft: 4 }}>{catInfo.label}</Text>
+                </View>
+                <View style={{ backgroundColor: getPriorityColor(complaint.priority) + '22', borderRadius: 6, paddingHorizontal: 10, paddingVertical: 4, marginBottom: 4 }}>
+                  <Text style={{ color: getPriorityColor(complaint.priority), fontSize: 12 }}>Priority: {complaint.priority.charAt(0).toUpperCase() + complaint.priority.slice(1)}</Text>
+                </View>
+              </View>
+            </View>
+            <View style={{ backgroundColor: getStatusColor(complaint.status) + '22', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 6 }}>
+              <Text style={{ color: getStatusColor(complaint.status), fontSize: 13, fontWeight: '700' }}>{getStatusLabel(complaint.status)}</Text>
+            </View>
+          </View>
+          <Text style={{ color: TEXT2, fontSize: 14, lineHeight: 22, marginBottom: 12 }}>{complaint.description}</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <MaterialIcons name="location-on" size={14} color={TEXT2} />
+              <Text style={{ color: TEXT2, fontSize: 13, marginLeft: 4 }}>{complaint.location}</Text>
+            </View>
+            <Text style={{ color: TEXT2, fontSize: 12 }}>{formatTime(complaint.created_at)}</Text>
+          </View>
+          {complaint.ai_risk && (
+            <View style={{ backgroundColor: ACCENT + '15', borderRadius: 10, padding: 12, marginTop: 12, flexDirection: 'row', alignItems: 'center' }}>
+              <MaterialIcons name="psychology" size={16} color={ACCENT} />
+              <View style={{ marginLeft: 8, flex: 1 }}>
+                <Text style={{ color: ACCENT, fontSize: 12, fontWeight: '600' }}>AI Risk: {complaint.ai_risk}</Text>
+                {complaint.ai_category ? <Text style={{ color: TEXT2, fontSize: 12, marginTop: 2 }}>{complaint.ai_category}</Text> : null}
+              </View>
+            </View>
+          )}
+        </View>
+        {/* Worker card */}
+        {worker && (
+          <View style={{ backgroundColor: CARD, borderRadius: 14, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: BORDER, flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: PRIMARY + '33', justifyContent: 'center', alignItems: 'center', marginRight: 14 }}>
+              <MaterialIcons name="engineering" size={26} color={PRIMARY} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ color: TEXT2, fontSize: 11, marginBottom: 2 }}>Assigned Worker</Text>
+              <Text style={{ color: TEXT, fontSize: 15, fontWeight: '700' }}>{worker.name}</Text>
+              <Text style={{ color: TEXT2, fontSize: 12 }}>{worker.dept}</Text>
+            </View>
+            <View style={{ backgroundColor: SUCCESS + '22', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4, flexDirection: 'row', alignItems: 'center' }}>
+              <MaterialIcons name="star" size={13} color={WARNING} />
+              <Text style={{ color: WARNING, fontSize: 12, marginLeft: 3 }}>{String(worker.rating)}</Text>
+            </View>
+          </View>
+        )}
+        {/* Timeline */}
+        <Text style={{ color: TEXT, fontSize: 16, fontWeight: 'bold', marginBottom: 14 }}>Timeline</Text>
+        {timeline.map((event, i) => (
+          <View key={i} style={{ flexDirection: 'row', marginBottom: 16 }}>
+            <View style={{ alignItems: 'center', marginRight: 14 }}>
+              <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: event.color + '22', justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: event.color }}>
+                <MaterialIcons name={event.icon} size={18} color={event.color} />
+              </View>
+              {i < timeline.length - 1 && <View style={{ width: 2, flex: 1, backgroundColor: BORDER, marginTop: 4 }} />}
+            </View>
+            <View style={{ flex: 1, backgroundColor: CARD, borderRadius: 12, padding: 14, borderWidth: 1, borderColor: BORDER }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                <Text style={{ color: TEXT, fontSize: 14, fontWeight: '600' }}>{event.label}</Text>
+                <Text style={{ color: TEXT2, fontSize: 11 }}>{formatTime(event.time)}</Text>
+              </View>
+              <Text style={{ color: TEXT2, fontSize: 13 }}>{event.desc}</Text>
+            </View>
+          </View>
+        ))}
+        {/* Rating */}
+        {complaint.status === 'resolved' && (
+          <View style={{ backgroundColor: CARD, borderRadius: 14, padding: 16, marginTop: 8, borderWidth: 1, borderColor: BORDER }}>
+            <Text style={{ color: TEXT, fontSize: 15, fontWeight: '700', marginBottom: 12 }}>Rate the Service</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 12 }}>
+              {[1,2,3,4,5].map(star => (
+                <TouchableOpacity key={star} onPress={() => setRating(star)} style={{ marginHorizontal: 6 }}>
+                  <MaterialIcons name={rating >= star ? 'star' : 'star-border'} size={34} color={WARNING} />
+                </TouchableOpacity>
+              ))}
+            </View>
+            {rating > 0 && (
+              <TouchableOpacity style={{ backgroundColor: SUCCESS, borderRadius: 10, padding: 12, alignItems: 'center' }} onPress={() => { Platform.OS === 'web' ? alert('Thank you for rating!') : Alert.alert('Thank you!', 'Rating submitted.'); setRating(0); }}>
+                <Text style={{ color: '#fff', fontSize: 14, fontWeight: '700' }}>Submit Rating</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+      </ScrollView>
+    </View>
+  );
+}

@@ -1,0 +1,86 @@
+import React from 'react';
+import { View, Platform, StatusBar } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
+import { NavigationContainer, NavigationIndependentTree } from '@react-navigation/native';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { AppProvider, BG, CARD, BORDER, DANGER, PRIMARY, TEXT2, TAB_MENU_HEIGHT } from './core';
+import HomeScreen from './HomeScreen';
+import ComplaintsScreen from './ComplaintsScreen';
+import SOSScreen from './SOSScreen';
+import FeedScreen from './FeedScreen';
+import ProfileScreen from './ProfileScreen';
+import RaiseComplaintScreen from './RaiseComplaintScreen';
+import ComplaintDetailScreen from './ComplaintDetailScreen';
+import AdminDashboardScreen from './AdminDashboardScreen';
+import AnalyticsScreen from './AnalyticsScreen';
+import MapViewScreen from './MapViewScreen';
+import NotificationsScreen from './NotificationsScreen';
+
+const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
+
+function TabNavigator() {
+  const insets = useSafeAreaInsets();
+  return (
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarStyle: {
+          position: 'absolute', bottom: 0,
+          height: Platform.OS === 'web' ? TAB_MENU_HEIGHT : TAB_MENU_HEIGHT + insets.bottom,
+          borderTopWidth: 1, borderTopColor: BORDER, backgroundColor: CARD,
+          elevation: 20, shadowColor: '#000', shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.3, shadowRadius: 12,
+        },
+        tabBarActiveTintColor: PRIMARY,
+        tabBarInactiveTintColor: TEXT2,
+        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
+      }}
+    >
+      <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarIcon: ({ color }) => <MaterialIcons name="home" size={24} color={color} />, tabBarLabel: 'Home' }} />
+      <Tab.Screen name="MyComplaints" component={ComplaintsScreen} options={{ tabBarLabel: 'Complaints', tabBarIcon: ({ color }) => <MaterialIcons name="report-problem" size={24} color={color} /> }} />
+      <Tab.Screen name="SOS" component={SOSScreen} options={{
+        tabBarLabel: 'SOS',
+        tabBarIcon: () => (
+          <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: DANGER, justifyContent: 'center', alignItems: 'center', marginBottom: Platform.OS === 'ios' ? 14 : 0, shadowColor: DANGER, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 8, elevation: 8 }}>
+            <MaterialIcons name="sos" size={26} color="#fff" />
+          </View>
+        ),
+        tabBarLabelStyle: { color: DANGER, fontSize: 11, fontWeight: '700' },
+      }} />
+      <Tab.Screen name="Feed" component={FeedScreen} options={{ tabBarLabel: 'Feed', tabBarIcon: ({ color }) => <MaterialIcons name="forum" size={24} color={color} /> }} />
+      <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: 'Profile', tabBarIcon: ({ color }) => <MaterialIcons name="person" size={24} color={color} /> }} />
+    </Tab.Navigator>
+  );
+}
+
+function AppNavigator() {
+  return (
+    <AppProvider>
+      <StatusBar barStyle="light-content" backgroundColor={BG} />
+      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="MainApp">
+        <Stack.Screen name="MainApp" component={TabNavigator} />
+        <Stack.Screen name="RaiseComplaint" component={RaiseComplaintScreen} />
+        <Stack.Screen name="ComplaintDetail" component={ComplaintDetailScreen} initialParams={{ complaintId: null }} />
+        <Stack.Screen name="AdminDashboard" component={AdminDashboardScreen} />
+        <Stack.Screen name="Analytics" component={AnalyticsScreen} />
+        <Stack.Screen name="MapView" component={MapViewScreen} />
+        <Stack.Screen name="Notifications" component={NotificationsScreen} />
+      </Stack.Navigator>
+    </AppProvider>
+  );
+}
+
+export default function ColonyCareApp() {
+  return (
+    <SafeAreaProvider>
+      <NavigationIndependentTree>
+        <NavigationContainer>
+          <AppNavigator />
+        </NavigationContainer>
+      </NavigationIndependentTree>
+    </SafeAreaProvider>
+  );
+}
