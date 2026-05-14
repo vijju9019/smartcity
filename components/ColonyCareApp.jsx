@@ -20,6 +20,8 @@ import MapViewScreen from './MapViewScreen';
 import NotificationsScreen from './NotificationsScreen';
 import SignupScreen from './SignupScreen';
 import LoginScreen from './LoginScreen';
+import WorkersScreen from './WorkersScreen';
+import { useApp } from './core';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -58,6 +60,8 @@ if (Platform.OS === 'web' && typeof document !== 'undefined') {
 
 function TabNavigator() {
   const insets = useSafeAreaInsets();
+  const { role } = useApp();
+  
   return (
     <Tab.Navigator
       screenOptions={{
@@ -76,15 +80,29 @@ function TabNavigator() {
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarIcon: ({ color }) => <MaterialIcons name="home" size={24} color={color} />, tabBarLabel: 'Home' }} />
       <Tab.Screen name="MyComplaints" component={ComplaintsScreen} options={{ tabBarLabel: 'Complaints', tabBarIcon: ({ color }) => <MaterialIcons name="report-problem" size={24} color={color} /> }} />
-      <Tab.Screen name="SOS" component={SOSScreen} options={{
-        tabBarLabel: 'SOS',
-        tabBarIcon: () => (
-          <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: DANGER, justifyContent: 'center', alignItems: 'center', marginBottom: Platform.OS === 'ios' ? 14 : 0, shadowColor: DANGER, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 8, elevation: 8 }}>
-            <MaterialIcons name="sos" size={26} color="#fff" />
-          </View>
-        ),
-        tabBarLabelStyle: { color: DANGER, fontSize: 11, fontWeight: '700' },
-      }} />
+      
+      {role === 'admin' ? (
+        <Tab.Screen name="WorkersTab" component={WorkersScreen} options={{
+          tabBarLabel: 'Staff',
+          tabBarIcon: ({ color }) => (
+            <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: PRIMARY, justifyContent: 'center', alignItems: 'center', marginBottom: Platform.OS === 'ios' ? 14 : 0, shadowColor: PRIMARY, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 8, elevation: 8 }}>
+              <MaterialIcons name="engineering" size={26} color="#fff" />
+            </View>
+          ),
+          tabBarLabelStyle: { color: PRIMARY, fontSize: 11, fontWeight: '700' },
+        }} />
+      ) : (
+        <Tab.Screen name="SOS" component={SOSScreen} options={{
+          tabBarLabel: 'SOS',
+          tabBarIcon: () => (
+            <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: DANGER, justifyContent: 'center', alignItems: 'center', marginBottom: Platform.OS === 'ios' ? 14 : 0, shadowColor: DANGER, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 8, elevation: 8 }}>
+              <MaterialIcons name="sos" size={26} color="#fff" />
+            </View>
+          ),
+          tabBarLabelStyle: { color: DANGER, fontSize: 11, fontWeight: '700' },
+        }} />
+      )}
+
       <Tab.Screen name="Feed" component={FeedScreen} options={{ tabBarLabel: 'Feed', tabBarIcon: ({ color }) => <MaterialIcons name="forum" size={24} color={color} /> }} />
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: 'Profile', tabBarIcon: ({ color }) => <MaterialIcons name="person" size={24} color={color} /> }} />
     </Tab.Navigator>

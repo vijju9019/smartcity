@@ -31,7 +31,7 @@ export default function ProfileScreen({ navigation }) {
       const doLogout = () => {
         navigation.reset({
           index: 0,
-          routes: [{ name: 'Signup' }],
+          routes: [{ name: 'Login' }],
         });
       };
       if (Platform.OS === 'web') {
