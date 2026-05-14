@@ -15,6 +15,9 @@ export default function LoginScreen({ navigation }) {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [googleModalVisible, setGoogleModalVisible] = useState(false);
+  const [otherAccVisible, setOtherAccVisible] = useState(false);
+  const [customName, setCustomName] = useState('');
+  const [customEmail, setCustomEmail] = useState('');
 
   const GOOGLE_ACCOUNTS = [
     { name: 'Kshitij Dinni', email: 'kshitijdinni6605@gmail.com', role: 'resident', avatar: 'K' },
@@ -42,13 +45,27 @@ export default function LoginScreen({ navigation }) {
   const selectGoogleAccount = (acc) => {
     setLoadingGoogle(true);
     setGoogleModalVisible(false);
+    setOtherAccVisible(false);
     setTimeout(() => {
       setUserName(acc.name);
       setUserEmail(acc.email);
-      setRole(acc.role);
+      setRole(acc.role || 'resident');
       setLoadingGoogle(false);
       navigation.replace('MainApp');
     }, 1500);
+  };
+
+  const handleUseOtherAccount = () => {
+    setGoogleModalVisible(false);
+    setOtherAccVisible(true);
+  };
+
+  const submitCustomAccount = () => {
+    if (!customName || !customEmail) {
+      if (Platform.OS === 'web') alert('Please fill in both name and email');
+      return;
+    }
+    selectGoogleAccount({ name: customName, email: customEmail, role: 'resident', avatar: customName.charAt(0).toUpperCase() });
   };
 
   return (
@@ -188,6 +205,7 @@ export default function LoginScreen({ navigation }) {
               </View>
 
               <TouchableOpacity 
+                onPress={handleUseOtherAccount}
                 style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 24, paddingVertical: 14, borderTopWidth: 1, borderTopColor: '#f1f3f4' }}
               >
                 <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#f1f3f4', justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
@@ -208,6 +226,52 @@ export default function LoginScreen({ navigation }) {
               >
                 <Text style={{ color: PRIMARY, fontWeight: '700' }}>Cancel</Text>
               </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+        {/* Other Account Input Modal */}
+        <Modal visible={otherAccVisible} transparent animationType="slide">
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+            <View style={{ width: '100%', maxWidth: 340, backgroundColor: '#fff', borderRadius: 24, padding: 24 }}>
+              <View style={{ alignItems: 'center', marginBottom: 24 }}>
+                <MaterialCommunityIcons name="google" size={32} color="#EA4335" />
+                <Text style={{ fontSize: 18, fontWeight: '700', color: '#202124', marginTop: 12 }}>Sign in</Text>
+                <Text style={{ fontSize: 14, color: '#5f6368', marginTop: 4 }}>with your Google Account</Text>
+              </View>
+
+              <View style={{ marginBottom: 16 }}>
+                <TextInput 
+                  placeholder="Full Name" 
+                  value={customName}
+                  onChangeText={setCustomName}
+                  placeholderTextColor="#9CA3AF"
+                  style={{ width: '100%', borderBottomWidth: 1, borderBottomColor: '#dadce0', paddingVertical: 10, fontSize: 15, color: '#202124' }} 
+                />
+              </View>
+
+              <View style={{ marginBottom: 24 }}>
+                <TextInput 
+                  placeholder="Email" 
+                  value={customEmail}
+                  onChangeText={setCustomEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  placeholderTextColor="#9CA3AF"
+                  style={{ width: '100%', borderBottomWidth: 1, borderBottomColor: '#dadce0', paddingVertical: 10, fontSize: 15, color: '#202124' }} 
+                />
+              </View>
+
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' }}>
+                <TouchableOpacity onPress={() => setOtherAccVisible(false)} style={{ marginRight: 16 }}>
+                  <Text style={{ color: PRIMARY, fontWeight: '700' }}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  onPress={submitCustomAccount}
+                  style={{ backgroundColor: PRIMARY, paddingHorizontal: 24, paddingVertical: 10, borderRadius: 8 }}
+                >
+                  <Text style={{ color: '#fff', fontWeight: '700' }}>Next</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </Modal>

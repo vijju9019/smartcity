@@ -4,6 +4,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PRIMARY, BG, CARD, TEXT, TEXT2, BORDER, ACCENT, SECONDARY, SUCCESS, useApp } from './core';
+import { Modal } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -28,15 +29,45 @@ export default function SignupScreen({ navigation }) {
 
   const [loadingGoogle, setLoadingGoogle] = useState(false);
 
+  const [googleModalVisible, setGoogleModalVisible] = useState(false);
+  const [otherAccVisible, setOtherAccVisible] = useState(false);
+  const [customName, setCustomName] = useState('');
+  const [customEmail, setCustomEmail] = useState('');
+
+  const GOOGLE_ACCOUNTS = [
+    { name: 'Kshitij Dinni', email: 'kshitijdinni6605@gmail.com', role: 'resident', avatar: 'K' },
+    { name: 'Colony Admin', email: 'admin@colony.care', role: 'admin', avatar: 'A' },
+    { name: 'City Worker', email: 'worker@colony.care', role: 'worker', avatar: 'W' },
+  ];
+
   const handleGoogleLogin = () => {
+    setGoogleModalVisible(true);
+  };
+
+  const selectGoogleAccount = (acc) => {
     setLoadingGoogle(true);
+    setGoogleModalVisible(false);
+    setOtherAccVisible(false);
     setTimeout(() => {
-      setUserName('Kshitij Dinni');
-      setUserEmail('kshitijdinni6605@gmail.com');
-      setRole('resident');
+      setUserName(acc.name);
+      setUserEmail(acc.email);
+      setRole(acc.role || selectedRole);
       setLoadingGoogle(false);
       navigation.replace('MainApp');
-    }, 2000);
+    }, 1500);
+  };
+
+  const handleUseOtherAccount = () => {
+    setGoogleModalVisible(false);
+    setOtherAccVisible(true);
+  };
+
+  const submitCustomAccount = () => {
+    if (!customName || !customEmail) {
+      if (Platform.OS === 'web') alert('Please fill in both name and email');
+      return;
+    }
+    selectGoogleAccount({ name: customName, email: customEmail, role: selectedRole, avatar: customName.charAt(0).toUpperCase() });
   };
 
   const ROLES = [
@@ -184,6 +215,113 @@ export default function SignupScreen({ navigation }) {
             </TouchableOpacity>
           </View>
         </View>
+        {/* Google Account Picker Modal */}
+        <Modal visible={googleModalVisible} transparent animationType="fade">
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+            <View style={{ width: '100%', maxWidth: 340, backgroundColor: '#fff', borderRadius: 24, paddingVertical: 24 }}>
+              <View style={{ alignItems: 'center', marginBottom: 20 }}>
+                <MaterialCommunityIcons name="google" size={32} color="#EA4335" />
+                <Text style={{ fontSize: 18, fontWeight: '700', color: '#202124', marginTop: 12 }}>Choose an account</Text>
+                <Text style={{ fontSize: 13, color: '#5f6368', marginTop: 4 }}>to continue to Colony Care</Text>
+              </View>
+              
+              <View style={{ marginBottom: 10 }}>
+                {GOOGLE_ACCOUNTS.map((acc, index) => (
+                  <TouchableOpacity 
+                    key={index}
+                    onPress={() => selectGoogleAccount(acc)}
+                    style={{ 
+                      flexDirection: 'row', 
+                      alignItems: 'center', 
+                      paddingHorizontal: 24, 
+                      paddingVertical: 14, 
+                      borderBottomWidth: index === GOOGLE_ACCOUNTS.length - 1 ? 0 : 1, 
+                      borderBottomColor: '#f1f3f4' 
+                    }}
+                  >
+                    <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: PRIMARY + '22', justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
+                      <Text style={{ color: PRIMARY, fontWeight: 'bold' }}>{acc.avatar}</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 14, fontWeight: '600', color: '#3c4043' }}>{acc.name}</Text>
+                      <Text style={{ fontSize: 12, color: '#5f6368' }}>{acc.email}</Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <TouchableOpacity 
+                onPress={handleUseOtherAccount}
+                style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 24, paddingVertical: 14, borderTopWidth: 1, borderTopColor: '#f1f3f4' }}
+              >
+                <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#f1f3f4', justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
+                  <MaterialIcons name="person-add-alt" size={20} color="#5f6368" />
+                </View>
+                <Text style={{ fontSize: 14, fontWeight: '600', color: '#3c4043' }}>Use another account</Text>
+              </TouchableOpacity>
+
+              <View style={{ paddingHorizontal: 24, marginTop: 12 }}>
+                <Text style={{ fontSize: 11, color: '#5f6368', textAlign: 'center' }}>
+                  To continue, Google will share your name, email address, and profile picture with Colony Care.
+                </Text>
+              </View>
+
+              <TouchableOpacity 
+                onPress={() => setGoogleModalVisible(false)}
+                style={{ alignSelf: 'center', marginTop: 20, padding: 10 }}
+              >
+                <Text style={{ color: PRIMARY, fontWeight: '700' }}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        {/* Other Account Input Modal */}
+        <Modal visible={otherAccVisible} transparent animationType="slide">
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+            <View style={{ width: '100%', maxWidth: 340, backgroundColor: '#fff', borderRadius: 24, padding: 24 }}>
+              <View style={{ alignItems: 'center', marginBottom: 24 }}>
+                <MaterialCommunityIcons name="google" size={32} color="#EA4335" />
+                <Text style={{ fontSize: 18, fontWeight: '700', color: '#202124', marginTop: 12 }}>Sign up</Text>
+                <Text style={{ fontSize: 14, color: '#5f6368', marginTop: 4 }}>with your Google Account</Text>
+              </View>
+
+              <View style={{ marginBottom: 16 }}>
+                <TextInput 
+                  placeholder="Full Name" 
+                  value={customName}
+                  onChangeText={setCustomName}
+                  placeholderTextColor="#9CA3AF"
+                  style={{ width: '100%', borderBottomWidth: 1, borderBottomColor: '#dadce0', paddingVertical: 10, fontSize: 15, color: '#202124' }} 
+                />
+              </View>
+
+              <View style={{ marginBottom: 24 }}>
+                <TextInput 
+                  placeholder="Email" 
+                  value={customEmail}
+                  onChangeText={setCustomEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  placeholderTextColor="#9CA3AF"
+                  style={{ width: '100%', borderBottomWidth: 1, borderBottomColor: '#dadce0', paddingVertical: 10, fontSize: 15, color: '#202124' }} 
+                />
+              </View>
+
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' }}>
+                <TouchableOpacity onPress={() => setOtherAccVisible(false)} style={{ marginRight: 16 }}>
+                  <Text style={{ color: PRIMARY, fontWeight: '700' }}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  onPress={submitCustomAccount}
+                  style={{ backgroundColor: PRIMARY, paddingHorizontal: 24, paddingVertical: 10, borderRadius: 8 }}
+                >
+                  <Text style={{ color: '#fff', fontWeight: '700' }}>Next</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </ScrollView>
     </KeyboardAvoidingView>
   );
