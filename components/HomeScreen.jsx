@@ -132,8 +132,8 @@ export default function HomeScreen({ navigation }) {
             </View>
           </View>
         </View>
-        {/* Raise CTA */}
-        {appCtx.role !== 'admin' && (
+        {/* Raise CTA - Only for Residents */}
+        {appCtx.role === 'resident' && (
           <TouchableOpacity onPress={() => navigation.navigate('RaiseComplaint')} style={{ backgroundColor: ACCENT, borderRadius: 16, padding: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>

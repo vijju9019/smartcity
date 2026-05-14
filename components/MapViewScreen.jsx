@@ -4,10 +4,11 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuery, useMaps } from 'platform-hooks';
-import { PRIMARY, SECONDARY, BG, CARD, SUCCESS, WARNING, DANGER, TEXT, TEXT2, BORDER, SEED_COMPLAINTS, getPriorityColor, getStatusLabel } from './core';
+import { PRIMARY, SECONDARY, BG, CARD, SUCCESS, WARNING, DANGER, TEXT, TEXT2, BORDER, SEED_COMPLAINTS, getPriorityColor, getStatusLabel, useApp } from './core';
 
 export default function MapViewScreen({ navigation }) {
   const insets = useSafeAreaInsets();
+  const { role } = useApp();
   const [mapFilter, setMapFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [mapType, setMapType] = useState('hybrid'); 
@@ -156,6 +157,17 @@ export default function MapViewScreen({ navigation }) {
               </View>
             </View>
           </View>
+
+          {/* Report Issue - Only for Residents and Admins */}
+          {role !== 'worker' && (
+            <TouchableOpacity 
+              onPress={() => navigation.navigate('RaiseComplaint', { lat: region.latitude, lng: region.longitude })}
+              style={{ backgroundColor: PRIMARY, borderRadius: 16, paddingVertical: 18, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', shadowColor: PRIMARY, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.3, shadowRadius: 10, elevation: 6, marginBottom: 24 }}
+            >
+              <MaterialIcons name="add-location-alt" size={24} color="#fff" style={{ marginRight: 10 }} />
+              <Text style={{ color: '#fff', fontSize: 17, fontWeight: 'bold' }}>Report Issue at this Building</Text>
+            </TouchableOpacity>
+          )}
 
           <View style={{ marginTop: 0 }}>
             <Text style={{ color: TEXT, fontSize: 18, fontWeight: 'bold', marginBottom: 16 }}>Top City Concerns</Text>
