@@ -14,7 +14,7 @@ import {
 export default function HomeScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const appCtx = useApp();
-  const { theme } = appCtx;
+  const { theme = { bg: '#0F172A', card: '#1E293B' }, role = 'resident', userName = 'User' } = appCtx;
   const [adminTab, setAdminTab] = useState('worker');
   const complaintsQ = useQuery('complaints');
   const complaints = useMemo(() => (complaintsQ.data?.length > 0 ? complaintsQ.data : SEED_COMPLAINTS), [complaintsQ.data]);

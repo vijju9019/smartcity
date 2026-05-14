@@ -12,7 +12,7 @@ import { Platform } from 'react-native';
 
 export default function ComplaintsScreen({ navigation }) {
   const insets = useSafeAreaInsets();
-  const { theme, role } = useApp();
+  const { theme = { bg: '#0F172A', card: '#1E293B' }, role = 'resident' } = useApp();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
   const complaintsQ = useQuery('complaints');

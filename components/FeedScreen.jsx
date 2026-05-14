@@ -10,7 +10,7 @@ const TYPE_ICONS = { complaint_ref: 'report-problem', positive: 'thumb-up', anno
 export default function FeedScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const appCtx = useApp();
-  const { theme } = appCtx;
+  const { theme = { bg: '#0F172A', card: '#1E293B' }, userName = 'User' } = appCtx;
   const [tab, setTab] = useState('trending');
   const [upvoted, setUpvoted] = useState({});
   const [counts, setCounts] = useState(FEED_SEED.reduce((acc, f) => { acc[f.id] = f.upvotes; return acc; }, {}));
