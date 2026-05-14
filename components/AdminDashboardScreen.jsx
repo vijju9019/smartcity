@@ -42,6 +42,11 @@ export default function AdminDashboardScreen({ navigation }) {
 
   const [newWorker, setNewWorker] = React.useState({ name: '', dept: '', email: '', phone: '', location: '' });
 
+  const handleAddWorker = () => {
+    if (!newWorker.name || !newWorker.dept || !newWorker.email || !newWorker.phone || !newWorker.location) {
+      Platform.OS === 'web' ? alert('Please fill all fields') : Alert.alert('Error', 'Please fill all fields');
+      return;
+    }
     const workerObj = {
       id: 'w' + Date.now(),
       name: newWorker.name,
