@@ -82,7 +82,7 @@ function TabNavigator() {
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarIcon: ({ color }) => <MaterialIcons name="home" size={24} color={color} />, tabBarLabel: 'Home' }} />
       <Tab.Screen name="MyComplaints" component={ComplaintsScreen} options={{ tabBarLabel: 'Complaints', tabBarIcon: ({ color }) => <MaterialIcons name="report-problem" size={24} color={color} /> }} />
-      {role === 'admin' ? (
+      {role === 'admin' && (
         <Tab.Screen name="WorkersTab" component={WorkersScreen} options={{
           tabBarLabel: 'Staff',
           tabBarIcon: () => (
@@ -92,7 +92,21 @@ function TabNavigator() {
           ),
           tabBarLabelStyle: { color: PRIMARY, fontSize: 10, fontWeight: '700' },
         }} />
-      ) : (
+      )}
+      
+      {role === 'worker' && (
+        <Tab.Screen name="Tasks" component={MyTasksScreen} options={{
+          tabBarLabel: 'Tasks',
+          tabBarIcon: () => (
+            <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: SUCCESS, justifyContent: 'center', alignItems: 'center', marginBottom: Platform.OS === 'ios' ? 14 : 0, shadowColor: SUCCESS, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 8, elevation: 8 }}>
+              <MaterialIcons name="assignment" size={26} color="#fff" />
+            </View>
+          ),
+          tabBarLabelStyle: { color: SUCCESS, fontSize: 10, fontWeight: '700' },
+        }} />
+      )}
+
+      {role === 'resident' && (
         <Tab.Screen name="SOS" component={SOSScreen} options={{
           tabBarLabel: 'SOS',
           tabBarIcon: () => (

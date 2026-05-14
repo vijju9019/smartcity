@@ -5,7 +5,8 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuery, useMutation } from 'platform-hooks';
 import { 
-  SEED_COMPLAINTS, getPriorityColor, getStatusLabel, formatTime 
+  PRIMARY, ACCENT, BG, CARD, SUCCESS, WARNING, DANGER, SECONDARY, TEXT, TEXT2, BORDER, 
+  SEED_COMPLAINTS, WORKERS, getPriorityColor, getStatusLabel, formatTime, getCategoryInfo, useApp 
 } from './core';
 
 // Worker-Specific Design System
@@ -21,6 +22,7 @@ const WORKER_BORDER = '#2D333D';
 
 export default function MyTasksScreen({ navigation }) {
   const insets = useSafeAreaInsets();
+  const { userName, role } = useApp();
   const [activeTab, setActiveTab] = useState('queue'); // Default to Queue
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -29,7 +31,12 @@ export default function MyTasksScreen({ navigation }) {
     return () => clearInterval(timer);
   }, []);
 
-  const currentWorkerId = 'w1'; 
+  // Find worker ID based on name or fallback to 'w1' for demo
+  const currentWorkerId = useMemo(() => {
+    const worker = WORKERS.find(w => w.name === userName);
+    return worker ? worker.id : 'w1';
+  }, [userName]);
+  
   const complaintsQ = useQuery('complaints');
   const { mutate: updateStatus } = useMutation('complaints', 'update');
   const allComplaints = useMemo(() => (complaintsQ.data?.length > 0 ? complaintsQ.data : SEED_COMPLAINTS), [complaintsQ.data]);
@@ -44,7 +51,7 @@ export default function MyTasksScreen({ navigation }) {
       return allComplaints.filter(c => c.worker_id === currentWorkerId && c.status === 'in_progress');
     }
     if (activeTab === 'history') {
-      return allComplaints.filter(c => c.worker_id === currentWorkerId && c.status === 'resolved');
+      return allComplaints.filter(c => c.worker_id === currentWorkerId && (c.status === 'resolved' || c.status === 'completed'));
     }
     return [];
   }, [allComplaints, activeTab, currentWorkerId]);
@@ -61,7 +68,7 @@ export default function MyTasksScreen({ navigation }) {
   const TABS = [
     { key: 'queue', label: 'RAISED ISSUES', icon: 'list-alt', count: allComplaints.filter(c => c.status === 'pending').length },
     { key: 'my_tasks', label: 'ASSIGNED TO ME', icon: 'engineering', count: allComplaints.filter(c => c.worker_id === currentWorkerId && c.status === 'in_progress').length },
-    { key: 'history', label: 'MY HISTORY', icon: 'history', count: allComplaints.filter(c => c.worker_id === currentWorkerId && c.status === 'resolved').length }
+    { key: 'history', label: 'MY HISTORY', icon: 'history', count: allComplaints.filter(c => c.worker_id === currentWorkerId && (c.status === 'resolved' || c.status === 'completed')).length }
   ];
 
   return (
@@ -71,7 +78,7 @@ export default function MyTasksScreen({ navigation }) {
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <View>
             <Text style={{ color: WORKER_PRIMARY, fontSize: 10, fontWeight: '900', letterSpacing: 1.5 }}>WORKER DASHBOARD</Text>
-            <Text style={{ color: WORKER_TEXT, fontSize: 22, fontWeight: 'bold' }}>John Doe</Text>
+            <Text style={{ color: WORKER_TEXT, fontSize: 22, fontWeight: 'bold' }}>{userName}</Text>
             <Text style={{ color: WORKER_TEXT2, fontSize: 11 }}>SECTOR: RESIDENCY MAINTENANCE</Text>
           </View>
           <View style={{ alignItems: 'flex-end' }}>
@@ -140,14 +147,21 @@ export default function MyTasksScreen({ navigation }) {
               </View>
 
               <View style={{ padding: 15 }}>
-                <Text style={{ color: WORKER_TEXT, fontSize: 17, fontWeight: 'bold', marginBottom: 8 }}>{task.title}</Text>
-                
-                <View style={{ backgroundColor: WORKER_BG, padding: 10, borderRadius: 4, marginBottom: 12, borderLeftWidth: 3, borderLeftColor: WORKER_PRIMARY }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
-                    <MaterialIcons name="location-on" size={14} color={WORKER_DANGER} />
-                    <Text style={{ color: WORKER_TEXT, fontSize: 13, fontWeight: 'bold', marginLeft: 4 }}>{task.location}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                  <View style={{ width: 40, height: 40, borderRadius: 8, backgroundColor: getCategoryInfo(task.category).color + '22', justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
+                    <MaterialIcons name={getCategoryInfo(task.category).icon} size={24} color={getCategoryInfo(task.category).color} />
                   </View>
-                  <Text style={{ color: WORKER_TEXT2, fontSize: 13, lineHeight: 18 }}>{task.description}</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ color: WORKER_TEXT, fontSize: 17, fontWeight: 'bold' }}>{task.title}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <MaterialIcons name="location-on" size={12} color={WORKER_DANGER} />
+                      <Text style={{ color: WORKER_TEXT2, fontSize: 12, marginLeft: 4 }}>{task.location}</Text>
+                    </View>
+                  </View>
+                </View>
+                
+                <View style={{ backgroundColor: WORKER_BG, padding: 12, borderRadius: 4, marginBottom: 16, borderLeftWidth: 3, borderLeftColor: WORKER_PRIMARY }}>
+                  <Text style={{ color: WORKER_TEXT, fontSize: 13, lineHeight: 20 }}>{task.description}</Text>
                 </View>
 
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
