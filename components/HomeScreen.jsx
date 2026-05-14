@@ -132,18 +132,6 @@ export default function HomeScreen({ navigation }) {
             </View>
           </View>
         </View>
-        {/* Stats row 1 */}
-        <View style={{ flexDirection: 'row', marginBottom: 12 }}>
-          <StatCard icon="report-problem" value={stats.total} label="Total" accent={PRIMARY} trend={12} />
-          <StatCard icon="pending" value={stats.pending} label="Pending" accent={WARNING} trend={-8} />
-          <StatCard icon="check-circle" value={stats.resolved} label="Resolved" accent={SUCCESS} trend={22} />
-        </View>
-        {/* Stats row 2 */}
-        <View style={{ flexDirection: 'row', marginBottom: 20 }}>
-          <StatCard icon="engineering" value={stats.inProg} label="In Progress" accent={SECONDARY} trend={5} />
-          <StatCard icon="priority-high" value={stats.critical} label="Critical" accent={DANGER} trend={-3} />
-          <StatCard icon="people" value={248} label="Residents" accent={ACCENT} trend={2} />
-        </View>
         {/* Raise CTA */}
         {appCtx.role !== 'admin' && (
           <TouchableOpacity onPress={() => navigation.navigate('RaiseComplaint')} style={{ backgroundColor: ACCENT, borderRadius: 16, padding: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
@@ -159,18 +147,6 @@ export default function HomeScreen({ navigation }) {
             <MaterialIcons name="arrow-forward-ios" size={18} color="rgba(255,255,255,0.7)" />
           </TouchableOpacity>
         )}
-        {/* Announcements */}
-        {ANNOUNCEMENTS.map(ann => (
-          <View key={ann.id} style={{ backgroundColor: ann.priority === 'high' ? DANGER + '22' : WARNING + '22', borderRadius: 12, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: ann.priority === 'high' ? DANGER + '44' : WARNING + '44', flexDirection: 'row', alignItems: 'center' }}>
-            <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: (ann.priority === 'high' ? DANGER : WARNING) + '33', justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
-              <MaterialIcons name={ann.priority === 'high' ? 'warning' : 'campaign'} size={20} color={ann.priority === 'high' ? DANGER : WARNING} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={{ color: TEXT, fontSize: 14, fontWeight: '600', marginBottom: 2 }}>{ann.title}</Text>
-              <Text style={{ color: TEXT2, fontSize: 12 }}>{ann.body} · {formatTime(ann.time)}</Text>
-            </View>
-          </View>
-        ))}
         {/* Weekly trend header */}
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, marginTop: 8 }}>
           <Text style={{ color: TEXT, fontSize: 17, fontWeight: 'bold' }}>Weekly Trend</Text>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Dimensions } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Dimensions, ActivityIndicator } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -26,11 +26,17 @@ export default function SignupScreen({ navigation }) {
     navigation.replace('MainApp');
   };
 
+  const [loadingGoogle, setLoadingGoogle] = useState(false);
+
   const handleGoogleLogin = () => {
-    setUserName('Google User');
-    setUserEmail('user@google.com');
-    setRole('resident');
-    navigation.replace('MainApp');
+    setLoadingGoogle(true);
+    setTimeout(() => {
+      setUserName('Kshitij Dinni');
+      setUserEmail('kshitijdinni6605@gmail.com');
+      setRole('resident');
+      setLoadingGoogle(false);
+      navigation.replace('MainApp');
+    }, 2000);
   };
 
   const ROLES = [
@@ -49,7 +55,7 @@ export default function SignupScreen({ navigation }) {
         <View style={{ paddingTop: insets.top + 40, paddingHorizontal: 30, alignItems: 'center' }}>
           <View style={{ width: 70, height: 70, borderRadius: 22, backgroundColor: PRIMARY, justifyContent: 'center', alignItems: 'center', marginBottom: 20, transform: [{ rotate: '45deg' }] }}>
             <View style={{ transform: [{ rotate: '-45deg' }] }}>
-              <MaterialIcons name="city" size={38} color="#fff" />
+              <MaterialIcons name="location-city" size={38} color="#fff" />
             </View>
           </View>
           
@@ -62,10 +68,17 @@ export default function SignupScreen({ navigation }) {
             <View style={{ flexDirection: 'row', marginBottom: 20 }}>
               <TouchableOpacity 
                 onPress={handleGoogleLogin}
-                style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', borderRadius: 12, paddingVertical: 12 }}
+                disabled={loadingGoogle}
+                style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', borderRadius: 12, paddingVertical: 12, opacity: loadingGoogle ? 0.7 : 1 }}
               >
-                <MaterialCommunityIcons name="google" size={18} color="#EA4335" />
-                <Text style={{ color: '#000', fontSize: 12, fontWeight: 'bold', marginLeft: 8 }}>Sign up with Google</Text>
+                {loadingGoogle ? (
+                  <ActivityIndicator size="small" color="#EA4335" />
+                ) : (
+                  <>
+                    <MaterialCommunityIcons name="google" size={18} color="#EA4335" />
+                    <Text style={{ color: '#000', fontSize: 12, fontWeight: 'bold', marginLeft: 8 }}>Sign up with Google</Text>
+                  </>
+                )}
               </TouchableOpacity>
             </View>
 

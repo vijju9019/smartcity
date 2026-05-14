@@ -33,6 +33,9 @@ export default function RaiseComplaintScreen({ navigation, route }) {
       setLng(route.params.lng);
       setLocation(route.params.lat.toFixed(6) + ', ' + route.params.lng.toFixed(6));
     }
+    if (route.params?.quickCategory) {
+      setCategory(route.params.quickCategory);
+    }
   }, [route.params]);
 
   React.useEffect(() => { if (cameraPhoto) setPhoto(cameraPhoto.uri); }, [cameraPhoto]);
