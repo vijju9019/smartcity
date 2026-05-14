@@ -38,7 +38,6 @@ export default function AdminDashboardScreen({ navigation }) {
   }, [updateComplaint]);
 
   const [newWorker, setNewWorker] = React.useState({ name: '', dept: '' });
-  const [newResident, setNewResident] = React.useState({ name: '', unit: '' });
 
   const handleAddWorker = () => {
     if (!newWorker.name || !newWorker.dept) {
@@ -47,15 +46,6 @@ export default function AdminDashboardScreen({ navigation }) {
     }
     Platform.OS === 'web' ? alert(`Worker ${newWorker.name} added!`) : Alert.alert('Success', `Worker ${newWorker.name} added.`);
     setNewWorker({ name: '', dept: '' });
-  };
-
-  const handleAddResident = () => {
-    if (!newResident.name || !newResident.unit) {
-      Platform.OS === 'web' ? alert('Please fill all fields') : Alert.alert('Error', 'Please fill all fields');
-      return;
-    }
-    Platform.OS === 'web' ? alert(`Resident ${newResident.name} added!`) : Alert.alert('Success', `Resident ${newResident.name} added.`);
-    setNewResident({ name: '', unit: '' });
   };
 
   return (
@@ -93,56 +83,31 @@ export default function AdminDashboardScreen({ navigation }) {
         <Text style={{ color: TEXT, fontSize: 16, fontWeight: 'bold', marginBottom: 12 }}>Community Management</Text>
         <View style={{ flexDirection: 'row', marginBottom: 16 }}>
           {/* Add Worker */}
-          <View style={{ flex: 1, backgroundColor: CARD, borderRadius: 16, padding: 14, marginRight: 8, borderWidth: 1, borderColor: BORDER }}>
+          <View style={{ flex: 1, backgroundColor: CARD, borderRadius: 16, padding: 14, borderWidth: 1, borderColor: BORDER }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
               <View style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: SUCCESS + '22', justifyContent: 'center', alignItems: 'center', marginRight: 8 }}>
                 <MaterialIcons name="person-add" size={18} color={SUCCESS} />
               </View>
-              <Text style={{ color: TEXT, fontSize: 14, fontWeight: '700' }}>Add Worker</Text>
+              <Text style={{ color: TEXT, fontSize: 14, fontWeight: '700' }}>Add New Worker</Text>
             </View>
-            <TextInput 
-              placeholder="Name" 
-              placeholderTextColor={TEXT2 + '88'} 
-              value={newWorker.name}
-              onChangeText={(t) => setNewWorker({...newWorker, name: t})}
-              style={{ backgroundColor: BG, borderRadius: 8, padding: 8, color: TEXT, fontSize: 12, marginBottom: 8, borderWidth: 1, borderColor: BORDER }} 
-            />
-            <TextInput 
-              placeholder="Department" 
-              placeholderTextColor={TEXT2 + '88'} 
-              value={newWorker.dept}
-              onChangeText={(t) => setNewWorker({...newWorker, dept: t})}
-              style={{ backgroundColor: BG, borderRadius: 8, padding: 8, color: TEXT, fontSize: 12, marginBottom: 12, borderWidth: 1, borderColor: BORDER }} 
-            />
-            <TouchableOpacity onPress={handleAddWorker} style={{ backgroundColor: SUCCESS, borderRadius: 8, paddingVertical: 8, alignItems: 'center' }}>
-              <Text style={{ color: '#fff', fontSize: 12, fontWeight: 'bold' }}>Add</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Add Resident */}
-          <View style={{ flex: 1, backgroundColor: CARD, borderRadius: 16, padding: 14, marginLeft: 8, borderWidth: 1, borderColor: BORDER }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-              <View style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: PRIMARY + '22', justifyContent: 'center', alignItems: 'center', marginRight: 8 }}>
-                <MaterialIcons name="group-add" size={18} color={PRIMARY} />
-              </View>
-              <Text style={{ color: TEXT, fontSize: 14, fontWeight: '700' }}>Add Member</Text>
+            <View style={{ flexDirection: 'row' }}>
+              <TextInput 
+                placeholder="Name" 
+                placeholderTextColor={TEXT2 + '88'} 
+                value={newWorker.name}
+                onChangeText={(t) => setNewWorker({...newWorker, name: t})}
+                style={{ flex: 1, backgroundColor: BG, borderRadius: 8, padding: 10, color: TEXT, fontSize: 12, marginRight: 8, borderWidth: 1, borderColor: BORDER }} 
+              />
+              <TextInput 
+                placeholder="Department" 
+                placeholderTextColor={TEXT2 + '88'} 
+                value={newWorker.dept}
+                onChangeText={(t) => setNewWorker({...newWorker, dept: t})}
+                style={{ flex: 1, backgroundColor: BG, borderRadius: 8, padding: 10, color: TEXT, fontSize: 12, borderWidth: 1, borderColor: BORDER }} 
+              />
             </View>
-            <TextInput 
-              placeholder="Name" 
-              placeholderTextColor={TEXT2 + '88'} 
-              value={newResident.name}
-              onChangeText={(t) => setNewResident({...newResident, name: t})}
-              style={{ backgroundColor: BG, borderRadius: 8, padding: 8, color: TEXT, fontSize: 12, marginBottom: 8, borderWidth: 1, borderColor: BORDER }} 
-            />
-            <TextInput 
-              placeholder="Unit/Block" 
-              placeholderTextColor={TEXT2 + '88'} 
-              value={newResident.unit}
-              onChangeText={(t) => setNewResident({...newResident, unit: t})}
-              style={{ backgroundColor: BG, borderRadius: 8, padding: 8, color: TEXT, fontSize: 12, marginBottom: 12, borderWidth: 1, borderColor: BORDER }} 
-            />
-            <TouchableOpacity onPress={handleAddResident} style={{ backgroundColor: PRIMARY, borderRadius: 8, paddingVertical: 8, alignItems: 'center' }}>
-              <Text style={{ color: '#fff', fontSize: 12, fontWeight: 'bold' }}>Add</Text>
+            <TouchableOpacity onPress={handleAddWorker} style={{ backgroundColor: SUCCESS, borderRadius: 10, paddingVertical: 12, alignItems: 'center', marginTop: 12 }}>
+              <Text style={{ color: '#fff', fontSize: 13, fontWeight: 'bold' }}>Register Worker</Text>
             </TouchableOpacity>
           </View>
         </View>
