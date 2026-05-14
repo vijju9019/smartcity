@@ -21,6 +21,7 @@ import NotificationsScreen from './NotificationsScreen';
 import SignupScreen from './SignupScreen';
 import LoginScreen from './LoginScreen';
 import WorkersScreen from './WorkersScreen';
+import ColonyEventsScreen from './ColonyEventsScreen';
 import { useApp } from './core';
 
 const Tab = createBottomTabNavigator();
@@ -122,6 +123,7 @@ function AppNavigator() {
         <Stack.Screen name="Analytics" component={AnalyticsScreen} />
         <Stack.Screen name="MapView" component={MapViewScreen} />
         <Stack.Screen name="Notifications" component={NotificationsScreen} />
+        <Stack.Screen name="ColonyEvents" component={ColonyEventsScreen} />
       </Stack.Navigator>
     </AppProvider>
   );

@@ -174,6 +174,23 @@ export default function HomeScreen({ navigation }) {
             ))}
           </View>
         </View>
+
+        {/* Colony Events Shortcut */}
+        <TouchableOpacity 
+          onPress={() => navigation.navigate('ColonyEvents')}
+          style={{ backgroundColor: CARD, borderRadius: 20, padding: 18, marginBottom: 20, borderWidth: 1, borderColor: BORDER, flexDirection: 'row', alignItems: 'center' }}
+        >
+          <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: SECONDARY + '22', justifyContent: 'center', alignItems: 'center', marginRight: 15 }}>
+            <MaterialIcons name="event" size={24} color={SECONDARY} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={{ color: TEXT, fontSize: 16, fontWeight: 'bold' }}>Colony Happenings</Text>
+            <Text style={{ color: TEXT2, fontSize: 12 }}>Check festivals, meetings & flat functions</Text>
+          </View>
+          <View style={{ backgroundColor: PRIMARY, borderRadius: 12, paddingHorizontal: 8, paddingVertical: 4 }}>
+            <Text style={{ color: '#fff', fontSize: 10, fontWeight: 'bold' }}>3 New</Text>
+          </View>
+        </TouchableOpacity>
         {/* Recent complaints */}
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
           <Text style={{ color: TEXT, fontSize: 17, fontWeight: 'bold' }}>Recent Complaints</Text>
