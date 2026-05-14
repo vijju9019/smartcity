@@ -287,8 +287,8 @@ export default function HomeScreen({ navigation }) {
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 }}>
             {catData.map((d, i) => (
               <View key={i} style={{ alignItems: 'center' }}>
-                <View style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: d.color + '22', justifyContent: 'center', alignItems: 'center', marginBottom: 4 }}>
-                  <Text style={{ color: d.color, fontSize: 13, fontWeight: 'bold' }}>{String(d.value)}</Text>
+                <View style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: d.color + '22', justifyContent: 'center', alignItems: 'center', marginBottom: 4 }}>
+                  <Text style={{ color: d.color, fontSize: 12, fontWeight: 'bold' }}>{String(d.value)}</Text>
                 </View>
                 <Text style={{ color: TEXT2, fontSize: 10 }}>{d.label}</Text>
               </View>

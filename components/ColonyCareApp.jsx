@@ -80,26 +80,25 @@ function TabNavigator() {
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarIcon: ({ color }) => <MaterialIcons name="home" size={24} color={color} />, tabBarLabel: 'Home' }} />
       <Tab.Screen name="MyComplaints" component={ComplaintsScreen} options={{ tabBarLabel: 'Complaints', tabBarIcon: ({ color }) => <MaterialIcons name="report-problem" size={24} color={color} /> }} />
-      
       {role === 'admin' ? (
         <Tab.Screen name="WorkersTab" component={WorkersScreen} options={{
           tabBarLabel: 'Staff',
-          tabBarIcon: ({ color }) => (
-            <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: PRIMARY, justifyContent: 'center', alignItems: 'center', marginBottom: Platform.OS === 'ios' ? 14 : 0, shadowColor: PRIMARY, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 8, elevation: 8 }}>
+          tabBarIcon: () => (
+            <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: PRIMARY, justifyContent: 'center', alignItems: 'center', marginBottom: Platform.OS === 'ios' ? 14 : 0, shadowColor: PRIMARY, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 8, elevation: 8 }}>
               <MaterialIcons name="engineering" size={26} color="#fff" />
             </View>
           ),
-          tabBarLabelStyle: { color: PRIMARY, fontSize: 11, fontWeight: '700' },
+          tabBarLabelStyle: { color: PRIMARY, fontSize: 10, fontWeight: '700' },
         }} />
       ) : (
         <Tab.Screen name="SOS" component={SOSScreen} options={{
           tabBarLabel: 'SOS',
           tabBarIcon: () => (
-            <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: DANGER, justifyContent: 'center', alignItems: 'center', marginBottom: Platform.OS === 'ios' ? 14 : 0, shadowColor: DANGER, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 8, elevation: 8 }}>
+            <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: DANGER, justifyContent: 'center', alignItems: 'center', marginBottom: Platform.OS === 'ios' ? 14 : 0, shadowColor: DANGER, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 8, elevation: 8 }}>
               <MaterialIcons name="sos" size={26} color="#fff" />
             </View>
           ),
-          tabBarLabelStyle: { color: DANGER, fontSize: 11, fontWeight: '700' },
+          tabBarLabelStyle: { color: DANGER, fontSize: 10, fontWeight: '700' },
         }} />
       )}
 
