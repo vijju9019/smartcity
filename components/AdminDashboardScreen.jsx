@@ -9,8 +9,17 @@ export default function AdminDashboardScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const complaintsQ = useQuery('complaints');
   const workersQ = useQuery('workers');
-  const allComplaints = useMemo(() => (complaintsQ.data?.length > 0 ? complaintsQ.data : SEED_COMPLAINTS), [complaintsQ.data]);
-  const allWorkers = useMemo(() => (workersQ.data?.length > 0 ? workersQ.data : WORKERS), [workersQ.data]);
+  const allComplaints = useMemo(() => {
+    const dbData = complaintsQ.data || [];
+    const seedIds = new Set(dbData.map(c => c.id));
+    return [...dbData, ...SEED_COMPLAINTS.filter(c => !seedIds.has(c.id))];
+  }, [complaintsQ.data]);
+
+  const allWorkers = useMemo(() => {
+    const dbData = workersQ.data || [];
+    const seedIds = new Set(dbData.map(w => w.id));
+    return [...dbData, ...WORKERS.filter(w => !seedIds.has(w.id))];
+  }, [workersQ.data]);
   const { mutate: updateComplaint } = useMutation('complaints', 'update');
   const { mutate: addWorker } = useMutation('workers', 'insert');
 

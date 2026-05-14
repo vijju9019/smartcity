@@ -16,7 +16,11 @@ export default function ComplaintsScreen({ navigation }) {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
   const complaintsQ = useQuery('complaints');
-  const allComplaints = useMemo(() => (complaintsQ.data?.length > 0 ? complaintsQ.data : SEED_COMPLAINTS), [complaintsQ.data]);
+  const allComplaints = useMemo(() => {
+    const dbData = complaintsQ.data || [];
+    const seedIds = new Set(dbData.map(c => c.id));
+    return [...dbData, ...SEED_COMPLAINTS.filter(c => !seedIds.has(c.id))];
+  }, [complaintsQ.data]);
   const filtered = useMemo(() => {
     let list = allComplaints;
     if (filter !== 'all') list = list.filter(c => c.status === filter);

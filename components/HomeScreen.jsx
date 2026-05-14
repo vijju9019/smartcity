@@ -22,7 +22,11 @@ export default function HomeScreen({ navigation }) {
   const [workerLocation, setWorkerLocation] = useState('');
   const complaintsQ = useQuery('complaints');
   const { mutate: addWorker } = useMutation('workers', 'insert');
-  const complaints = useMemo(() => (complaintsQ.data?.length > 0 ? complaintsQ.data : SEED_COMPLAINTS), [complaintsQ.data]);
+  const complaints = useMemo(() => {
+    const dbData = complaintsQ.data || [];
+    const seedIds = new Set(dbData.map(c => c.id));
+    return [...dbData, ...SEED_COMPLAINTS.filter(c => !seedIds.has(c.id))];
+  }, [complaintsQ.data]);
   const stats = useMemo(() => {
     const total = complaints.length;
     const pending = complaints.filter(c => c.status === 'pending').length;
