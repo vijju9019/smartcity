@@ -14,6 +14,7 @@ export default function SignupScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [selectedRole, setSelectedRole] = useState('resident');
 
   const handleSignup = () => {
@@ -147,9 +148,12 @@ export default function SignupScreen({ navigation }) {
                   onChangeText={setPassword}
                   placeholder="Password"
                   placeholderTextColor={TEXT2 + '66'}
-                  secureTextEntry
+                  secureTextEntry={!showPassword}
                   style={{ flex: 1, paddingVertical: 10, paddingHorizontal: 10, color: TEXT, fontSize: 14 }}
                 />
+                <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={{ padding: 4 }}>
+                  <MaterialIcons name={showPassword ? "visibility" : "visibility-off"} size={20} color={TEXT2} />
+                </TouchableOpacity>
               </View>
             </View>
 

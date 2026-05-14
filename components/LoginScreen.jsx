@@ -12,6 +12,7 @@ export default function LoginScreen({ navigation }) {
   const { setUserName, setUserEmail, setRole } = useApp();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
 
   const handleLogin = () => {
@@ -91,9 +92,12 @@ export default function LoginScreen({ navigation }) {
                   onChangeText={setPassword}
                   placeholder="Password"
                   placeholderTextColor={TEXT2 + '66'}
-                  secureTextEntry
+                  secureTextEntry={!showPassword}
                   style={{ flex: 1, paddingVertical: 12, paddingHorizontal: 10, color: TEXT, fontSize: 14 }}
                 />
+                <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={{ padding: 4 }}>
+                  <MaterialIcons name={showPassword ? "visibility" : "visibility-off"} size={20} color={TEXT2} />
+                </TouchableOpacity>
               </View>
             </View>
 
