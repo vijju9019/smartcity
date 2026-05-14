@@ -22,6 +22,7 @@ import SignupScreen from './SignupScreen';
 import LoginScreen from './LoginScreen';
 import WorkersScreen from './WorkersScreen';
 import ColonyEventsScreen from './ColonyEventsScreen';
+import MyTasksScreen from './MyTasksScreen';
 import { useApp } from './core';
 
 const Tab = createBottomTabNavigator();
@@ -124,6 +125,7 @@ function AppNavigator() {
         <Stack.Screen name="MapView" component={MapViewScreen} />
         <Stack.Screen name="Notifications" component={NotificationsScreen} />
         <Stack.Screen name="ColonyEvents" component={ColonyEventsScreen} />
+        <Stack.Screen name="MyTasks" component={MyTasksScreen} />
       </Stack.Navigator>
     </AppProvider>
   );

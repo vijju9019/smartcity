@@ -25,6 +25,7 @@ export default function ProfileScreen({ navigation }) {
     { icon: 'notifications', label: 'Notifications', action: () => navigation.navigate('Notifications') },
     { icon: 'analytics', label: 'Analytics', action: () => navigation.navigate('Analytics'), adminOnly: true },
     { icon: 'admin-panel-settings', label: 'Admin Dashboard', action: () => navigation.navigate('AdminDashboard'), adminOnly: true },
+    { icon: 'engineering', label: 'Worker Portal', action: () => navigation.navigate('MyTasks'), staffOnly: true },
     { icon: 'share', label: 'Share ColonyCare', action: () => {} },
     { icon: 'info', label: 'About', action: () => {} },
     { icon: 'logout', label: 'Logout', action: () => {
@@ -43,7 +44,7 @@ export default function ProfileScreen({ navigation }) {
         ]);
       }
     }, danger: true },
-  ].filter(item => !item.adminOnly || role === 'admin');
+  ].filter(item => (!item.adminOnly || role === 'admin') && (!item.staffOnly || role === 'worker' || role === 'admin'));
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: theme.bg }} contentContainerStyle={{ paddingBottom: scrollBottom }} showsVerticalScrollIndicator={true}>
