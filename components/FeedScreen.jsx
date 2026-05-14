@@ -65,7 +65,7 @@ export default function FeedScreen({ navigation }) {
   const appCtx = useApp();
   const { theme = { bg: '#0F172A', card: '#1E293B' }, userName = 'User' } = appCtx;
   
-  const [tab, setTab] = useState('announcements');
+  const [tab, setTab] = useState('updates');
   const [upvoted, setUpvoted] = useState({});
   const [counts, setCounts] = useState(FEED_SEED.reduce((acc, f) => { acc[f.id] = f.upvotes; return acc; }, {}));
   const [commentModal, setCommentModal] = useState({ visible: false, postId: null });
@@ -105,12 +105,12 @@ export default function FeedScreen({ navigation }) {
   };
 
   const filteredFeed = useMemo(() => {
-    if (tab === 'announcements') return feedItems.filter(f => f.type === 'announcement' || f.type === 'update' || f.type === 'complaint_ref');
-    if (tab === 'discussions') return feedItems.filter(f => f.type === 'discussion' || f.type === 'positive');
+    if (tab === 'updates') return feedItems.filter(f => f.type === 'announcement' || f.type === 'update' || f.type === 'complaint_ref');
+    if (tab === 'events') return feedItems.filter(f => f.content.toLowerCase().includes('event') || f.content.toLowerCase().includes('drive') || f.content.toLowerCase().includes('meeting'));
     return feedItems;
   }, [tab, feedItems]);
 
-  const TABS = [{ key: 'announcements', label: 'Updates' }, { key: 'discussions', label: 'Discussions' }];
+  const TABS = [{ key: 'updates', label: 'Updates' }, { key: 'events', label: 'Events' }];
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.bg }}>
