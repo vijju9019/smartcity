@@ -8,8 +8,11 @@ import { PRIMARY, ACCENT, BG, CARD, SECONDARY, SUCCESS, WARNING, DANGER, TEXT, T
 export default function AdminDashboardScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const complaintsQ = useQuery('complaints');
+  const workersQ = useQuery('workers');
   const allComplaints = useMemo(() => (complaintsQ.data?.length > 0 ? complaintsQ.data : SEED_COMPLAINTS), [complaintsQ.data]);
+  const allWorkers = useMemo(() => (workersQ.data?.length > 0 ? workersQ.data : WORKERS), [workersQ.data]);
   const { mutate: updateComplaint } = useMutation('complaints', 'update');
+  const { mutate: addWorker } = useMutation('workers', 'insert');
 
   const stats = useMemo(() => {
     const total = allComplaints.length;
@@ -39,13 +42,23 @@ export default function AdminDashboardScreen({ navigation }) {
 
   const [newWorker, setNewWorker] = React.useState({ name: '', dept: '', email: '', phone: '', location: '' });
 
-  const handleAddWorker = () => {
-    if (!newWorker.name || !newWorker.dept || !newWorker.email || !newWorker.phone || !newWorker.location) {
-      Platform.OS === 'web' ? alert('Please fill all fields') : Alert.alert('Error', 'Please fill all fields');
-      return;
-    }
-    Platform.OS === 'web' ? alert(`Worker ${newWorker.name} registered successfully!`) : Alert.alert('Success', `Worker ${newWorker.name} added.`);
-    setNewWorker({ name: '', dept: '', email: '', phone: '', location: '' });
+    const workerObj = {
+      id: 'w' + Date.now(),
+      name: newWorker.name,
+      dept: newWorker.dept,
+      email: newWorker.email,
+      phone: newWorker.phone,
+      location: newWorker.location,
+      rating: 5.0,
+      active: true,
+      completed: 0
+    };
+    addWorker(workerObj).then(() => {
+      Platform.OS === 'web' ? alert(`Worker ${newWorker.name} registered successfully!`) : Alert.alert('Success', `Worker ${newWorker.name} added.`);
+      setNewWorker({ name: '', dept: '', email: '', phone: '', location: '' });
+    }).catch(e => {
+      Platform.OS === 'web' ? alert(e.message) : Alert.alert('Error', e.message);
+    });
   };
 
   return (
@@ -139,14 +152,14 @@ export default function AdminDashboardScreen({ navigation }) {
 
         <Text style={{ color: TEXT, fontSize: 16, fontWeight: 'bold', marginBottom: 12 }}>Worker Status</Text>
         <View style={{ backgroundColor: CARD, borderRadius: 16, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: BORDER }}>
-          {WORKERS.map((w, i) => (
-            <View key={w.id} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: i < WORKERS.length - 1 ? 1 : 0, borderBottomColor: BORDER }}>
+          {allWorkers.map((w, i) => (
+            <View key={w.id} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: i < allWorkers.length - 1 ? 1 : 0, borderBottomColor: BORDER }}>
               <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: (w.active ? SUCCESS : TEXT2) + '33', justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
                 <MaterialIcons name="engineering" size={22} color={w.active ? SUCCESS : TEXT2} />
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={{ color: TEXT, fontSize: 14, fontWeight: '600' }}>{w.name}</Text>
-                <Text style={{ color: TEXT2, fontSize: 12 }}>{w.dept} · {w.completed} resolved</Text>
+                <Text style={{ color: TEXT2, fontSize: 12 }}>{w.dept} · {w.completed || 0} resolved</Text>
               </View>
               <View style={{ alignItems: 'flex-end' }}>
                 <View style={{ backgroundColor: (w.active ? SUCCESS : TEXT2) + '22', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, marginBottom: 4 }}>
@@ -154,7 +167,7 @@ export default function AdminDashboardScreen({ navigation }) {
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <MaterialIcons name="star" size={12} color={WARNING} />
-                  <Text style={{ color: WARNING, fontSize: 12, marginLeft: 2 }}>{String(w.rating)}</Text>
+                  <Text style={{ color: WARNING, fontSize: 12, marginLeft: 2 }}>{String(w.rating || 5.0)}</Text>
                 </View>
               </View>
             </View>
@@ -173,7 +186,7 @@ export default function AdminDashboardScreen({ navigation }) {
               </View>
             </View>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-              {WORKERS.filter(w => w.active).map(w => (
+              {allWorkers.filter(w => w.active).map(w => (
                 <TouchableOpacity key={w.id} onPress={() => handleAssign(c, w.id)} style={{ backgroundColor: SECONDARY + '22', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, marginRight: 6, marginBottom: 4, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: SECONDARY + '44' }}>
                   <MaterialIcons name="person-add" size={13} color={SECONDARY} />
                   <Text style={{ color: SECONDARY, fontSize: 12, marginLeft: 4 }}>{w.name.split(' ')[0]}</Text>
@@ -191,7 +204,7 @@ export default function AdminDashboardScreen({ navigation }) {
         )}
         <Text style={{ color: TEXT, fontSize: 16, fontWeight: 'bold', marginBottom: 12, marginTop: 16 }}>Active Work (In Progress)</Text>
         {allComplaints.filter(c => c.status === 'in_progress').map(c => {
-          const worker = WORKERS.find(w => w.id === c.worker_id);
+          const worker = allWorkers.find(w => w.id === c.worker_id);
           return (
             <View key={c.id} style={{ backgroundColor: CARD, borderRadius: 14, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: SECONDARY + '44', borderLeftWidth: 3, borderLeftColor: SECONDARY }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>

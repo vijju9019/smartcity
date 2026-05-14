@@ -3,7 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, Platform, TextInput, Alert } 
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useQuery } from 'platform-hooks';
+import { useQuery, useMutation } from 'platform-hooks';
 import {
   PRIMARY, SECONDARY, BG, CARD, ACCENT, SUCCESS, WARNING, DANGER, TEXT, TEXT2, BORDER,
   TAB_MENU_HEIGHT, SCROLL_EXTRA_PADDING, WEB_TAB_MENU_PADDING,
@@ -21,6 +21,7 @@ export default function HomeScreen({ navigation }) {
   const [workerPhone, setWorkerPhone] = useState('');
   const [workerLocation, setWorkerLocation] = useState('');
   const complaintsQ = useQuery('complaints');
+  const { mutate: addWorker } = useMutation('workers', 'insert');
   const complaints = useMemo(() => (complaintsQ.data?.length > 0 ? complaintsQ.data : SEED_COMPLAINTS), [complaintsQ.data]);
   const stats = useMemo(() => {
     const total = complaints.length;
@@ -169,12 +170,27 @@ export default function HomeScreen({ navigation }) {
               <TouchableOpacity 
                 onPress={() => {
                   if (workerName && workerDept && workerEmail && workerPhone && workerLocation) {
-                    Platform.OS === 'web' ? alert(`Worker ${workerName} registered successfully!`) : Alert.alert('Success', `Worker ${workerName} added.`);
-                    setWorkerName('');
-                    setWorkerDept('');
-                    setWorkerEmail('');
-                    setWorkerPhone('');
-                    setWorkerLocation('');
+                    const workerObj = {
+                      id: 'w' + Date.now(),
+                      name: workerName,
+                      dept: workerDept,
+                      email: workerEmail,
+                      phone: workerPhone,
+                      location: workerLocation,
+                      rating: 5.0,
+                      active: true,
+                      completed: 0
+                    };
+                    addWorker(workerObj).then(() => {
+                      Platform.OS === 'web' ? alert(`Worker ${workerName} registered successfully!`) : Alert.alert('Success', `Worker ${workerName} added.`);
+                      setWorkerName('');
+                      setWorkerDept('');
+                      setWorkerEmail('');
+                      setWorkerPhone('');
+                      setWorkerLocation('');
+                    }).catch(e => {
+                      Platform.OS === 'web' ? alert(e.message) : Alert.alert('Error', e.message);
+                    });
                   } else {
                     Platform.OS === 'web' ? alert('Please fill all fields') : Alert.alert('Error', 'Please fill all fields');
                   }
