@@ -91,120 +91,23 @@ export default function HomeScreen({ navigation }) {
 
         {/* Admin Management Section */}
         {appCtx.role === 'admin' && (
-          <View style={{ marginBottom: 24, backgroundColor: CARD, borderRadius: 20, padding: 18, borderWidth: 1, borderColor: PRIMARY + '44' }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <View style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: PRIMARY + '22', justifyContent: 'center', alignItems: 'center', marginRight: 10 }}>
-                  <MaterialIcons name="admin-panel-settings" size={20} color={PRIMARY} />
-                </View>
-                <Text style={{ color: TEXT, fontSize: 17, fontWeight: 'bold' }}>Admin Management</Text>
+          <TouchableOpacity 
+            onPress={() => navigation.navigate('WorkersTab')}
+            style={{ backgroundColor: CARD, borderRadius: 20, padding: 20, marginBottom: 24, borderWidth: 1, borderColor: PRIMARY + '44', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View style={{ width: 48, height: 48, borderRadius: 14, backgroundColor: SUCCESS + '22', justifyContent: 'center', alignItems: 'center', marginRight: 16 }}>
+                <MaterialIcons name="person-add" size={26} color={SUCCESS} />
+              </View>
+              <View>
+                <Text style={{ color: TEXT, fontSize: 17, fontWeight: 'bold' }}>Staff Management</Text>
+                <Text style={{ color: TEXT2, fontSize: 13 }}>Register or view all colony workers</Text>
               </View>
             </View>
-
-            <View style={{ marginBottom: 12 }}>
-              <Text style={{ color: TEXT2, fontSize: 11, fontWeight: '700', letterSpacing: 1, marginBottom: 10, textTransform: 'uppercase' }}>New Worker Details</Text>
-              
-              <View style={{ flexDirection: 'row', marginBottom: 12 }}>
-                <View style={{ flex: 1, marginRight: 6 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: BG, borderRadius: 10, borderWidth: 1, borderColor: BORDER, paddingHorizontal: 10 }}>
-                    <MaterialIcons name="person" size={16} color={TEXT2} />
-                    <TextInput 
-                      value={workerName}
-                      onChangeText={setWorkerName}
-                      placeholder="Name" 
-                      placeholderTextColor={TEXT2 + '66'} 
-                      style={{ flex: 1, color: TEXT, fontSize: 13, paddingVertical: 10, paddingHorizontal: 8 }}
-                    />
-                  </View>
-                </View>
-                <View style={{ flex: 1, marginLeft: 6 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: BG, borderRadius: 10, borderWidth: 1, borderColor: BORDER, paddingHorizontal: 10 }}>
-                    <MaterialIcons name="work" size={16} color={TEXT2} />
-                    <TextInput 
-                      value={workerDept}
-                      onChangeText={setWorkerDept}
-                      placeholder="Dept" 
-                      placeholderTextColor={TEXT2 + '66'} 
-                      style={{ flex: 1, color: TEXT, fontSize: 13, paddingVertical: 10, paddingHorizontal: 8 }}
-                    />
-                  </View>
-                </View>
-              </View>
-
-              <View style={{ flexDirection: 'row', marginBottom: 12 }}>
-                <View style={{ flex: 1, marginRight: 6 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: BG, borderRadius: 10, borderWidth: 1, borderColor: BORDER, paddingHorizontal: 10 }}>
-                    <MaterialIcons name="mail" size={16} color={TEXT2} />
-                    <TextInput 
-                      value={workerEmail}
-                      onChangeText={setWorkerEmail}
-                      placeholder="Email" 
-                      placeholderTextColor={TEXT2 + '66'} 
-                      keyboardType="email-address"
-                      style={{ flex: 1, color: TEXT, fontSize: 13, paddingVertical: 10, paddingHorizontal: 8 }}
-                    />
-                  </View>
-                </View>
-                <View style={{ flex: 1, marginLeft: 6 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: BG, borderRadius: 10, borderWidth: 1, borderColor: BORDER, paddingHorizontal: 10 }}>
-                    <MaterialIcons name="phone" size={16} color={TEXT2} />
-                    <TextInput 
-                      value={workerPhone}
-                      onChangeText={setWorkerPhone}
-                      placeholder="Phone" 
-                      placeholderTextColor={TEXT2 + '66'} 
-                      keyboardType="phone-pad"
-                      style={{ flex: 1, color: TEXT, fontSize: 13, paddingVertical: 10, paddingHorizontal: 8 }}
-                    />
-                  </View>
-                </View>
-              </View>
-
-              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: BG, borderRadius: 10, borderWidth: 1, borderColor: BORDER, paddingHorizontal: 10, marginBottom: 16 }}>
-                <MaterialIcons name="location-on" size={16} color={TEXT2} />
-                <TextInput 
-                  value={workerLocation}
-                  onChangeText={setWorkerLocation}
-                  placeholder="Assigned Working Area / Block" 
-                  placeholderTextColor={TEXT2 + '66'} 
-                  style={{ flex: 1, color: TEXT, fontSize: 13, paddingVertical: 10, paddingHorizontal: 8 }}
-                />
-              </View>
-
-              <TouchableOpacity 
-                onPress={() => {
-                  if (workerName && workerDept && workerEmail && workerPhone && workerLocation) {
-                    const workerObj = {
-                      id: 'w' + Date.now(),
-                      name: workerName,
-                      dept: workerDept,
-                      email: workerEmail,
-                      phone: workerPhone,
-                      location: workerLocation,
-                      rating: 5.0,
-                      active: true,
-                      completed: 0
-                    };
-                    addWorker(workerObj).then(() => {
-                      Platform.OS === 'web' ? alert(`Worker ${workerName} registered successfully!`) : Alert.alert('Success', `Worker ${workerName} added.`);
-                      setWorkerName('');
-                      setWorkerDept('');
-                      setWorkerEmail('');
-                      setWorkerPhone('');
-                      setWorkerLocation('');
-                    }).catch(e => {
-                      Platform.OS === 'web' ? alert(e.message) : Alert.alert('Error', e.message);
-                    });
-                  } else {
-                    Platform.OS === 'web' ? alert('Please fill all fields') : Alert.alert('Error', 'Please fill all fields');
-                  }
-                }}
-                style={{ backgroundColor: SUCCESS, borderRadius: 12, paddingVertical: 12, alignItems: 'center', shadowColor: SUCCESS, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 6, elevation: 4 }}
-              >
-                <Text style={{ color: '#fff', fontSize: 14, fontWeight: 'bold' }}>Register Worker</Text>
-              </TouchableOpacity>
+            <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: BORDER, justifyContent: 'center', alignItems: 'center' }}>
+              <MaterialIcons name="arrow-forward" size={20} color={TEXT2} />
             </View>
-          </View>
+          </TouchableOpacity>
         )}
 
         {/* Hero */}
