@@ -4,7 +4,10 @@ import {
   Modal, Alert, Platform, StatusBar, ActivityIndicator,
   KeyboardAvoidingView, FlatList, Dimensions, Image, Switch
 } from 'react-native';
-import { MaterialIcons, Ionicons, MaterialCommunityIcons, Feather } from '@expo/vector-icons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Feather from 'react-native-vector-icons/Feather';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -40,16 +43,17 @@ export const AppProvider = ({ children }) => {
   const [role, setRole] = useState('resident');
   const [userName, setUserName] = useState('Kshitij Dinni');
   const [userEmail, setUserEmail] = useState('kshitijdinni6605@gmail.com');
-  const [darkMode, setDarkMode] = useState(true);
+  
   const theme = useMemo(() => ({
-    bg: darkMode ? BG : '#F1F5F9',
-    card: darkMode ? CARD : '#FFFFFF',
-    text: darkMode ? TEXT : '#0F172A',
-    text2: darkMode ? TEXT2 : '#64748B',
-    border: darkMode ? BORDER : 'rgba(0,0,0,0.08)',
-    glass: darkMode ? GLASS : 'rgba(255,255,255,0.85)',
-  }), [darkMode]);
-  const value = useMemo(() => ({ role, setRole, userName, setUserName, userEmail, setUserEmail, darkMode, setDarkMode, theme }), [role, userName, userEmail, darkMode, theme]);
+    bg: BG,
+    card: CARD,
+    text: TEXT,
+    text2: TEXT2,
+    border: BORDER,
+    glass: GLASS,
+  }), []);
+
+  const value = useMemo(() => ({ role, setRole, userName, setUserName, userEmail, setUserEmail, theme }), [role, userName, userEmail, theme]);
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
 export const useApp = () => useContext(AppContext);

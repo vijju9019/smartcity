@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Alert, Platform, Dimensions, TextInput } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuery, useMutation } from 'platform-hooks';
 import { PRIMARY, ACCENT, BG, CARD, SECONDARY, SUCCESS, WARNING, DANGER, TEXT, TEXT2, BORDER, SEED_COMPLAINTS, WORKERS, CATEGORIES, StatCard, MiniBarChart, getPriorityColor, formatTime } from './core';
@@ -28,6 +28,12 @@ export default function AdminDashboardScreen({ navigation }) {
   const handleAssign = useCallback((complaint, workerId) => {
     updateComplaint({ id: complaint.id, data: { worker_id: workerId, status: 'in_progress', updated_at: Date.now() } })
       .then(() => { Platform.OS === 'web' ? alert('Worker assigned!') : Alert.alert('Assigned', 'Worker assigned.'); })
+      .catch(e => { Platform.OS === 'web' ? alert(e.message) : Alert.alert('Error', e.message); });
+  }, [updateComplaint]);
+
+  const handleResolve = useCallback((complaintId) => {
+    updateComplaint({ id: complaintId, data: { status: 'resolved', updated_at: Date.now() } })
+      .then(() => { Platform.OS === 'web' ? alert('Complaint resolved!') : Alert.alert('Success', 'Complaint marked as resolved.'); })
       .catch(e => { Platform.OS === 'web' ? alert(e.message) : Alert.alert('Error', e.message); });
   }, [updateComplaint]);
 
@@ -187,10 +193,36 @@ export default function AdminDashboardScreen({ navigation }) {
           </View>
         ))}
         {allComplaints.filter(c => c.status === 'pending').length === 0 && (
-          <View style={{ backgroundColor: SUCCESS + '22', borderRadius: 14, padding: 20, alignItems: 'center', borderWidth: 1, borderColor: SUCCESS + '44' }}>
+          <View style={{ backgroundColor: SUCCESS + '22', borderRadius: 14, padding: 20, alignItems: 'center', borderWidth: 1, borderColor: SUCCESS + '44', marginBottom: 16 }}>
             <MaterialIcons name="check-circle" size={40} color={SUCCESS} />
             <Text style={{ color: SUCCESS, fontSize: 15, fontWeight: '700', marginTop: 8 }}>All caught up!</Text>
             <Text style={{ color: TEXT2, fontSize: 13, marginTop: 4 }}>No pending complaints in queue.</Text>
+          </View>
+        )}
+        <Text style={{ color: TEXT, fontSize: 16, fontWeight: 'bold', marginBottom: 12, marginTop: 16 }}>Active Work (In Progress)</Text>
+        {allComplaints.filter(c => c.status === 'in_progress').map(c => {
+          const worker = WORKERS.find(w => w.id === c.worker_id);
+          return (
+            <View key={c.id} style={{ backgroundColor: CARD, borderRadius: 14, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: SECONDARY + '44', borderLeftWidth: 3, borderLeftColor: SECONDARY }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                <View style={{ flex: 1, marginRight: 8 }}>
+                  <Text style={{ color: TEXT, fontSize: 14, fontWeight: '600', marginBottom: 4 }}>{c.title}</Text>
+                  <Text style={{ color: TEXT2, fontSize: 12 }}>{c.location} · Assigned to {worker?.name || 'Unknown'}</Text>
+                </View>
+                <TouchableOpacity onPress={() => handleResolve(c.id)} style={{ backgroundColor: SUCCESS, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 }}>
+                  <Text style={{ color: '#fff', fontSize: 11, fontWeight: 'bold' }}>Resolve</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={{ height: 4, backgroundColor: BG, borderRadius: 2, overflow: 'hidden', marginTop: 4 }}>
+                <View style={{ height: '100%', width: '65%', backgroundColor: SECONDARY }} />
+              </View>
+              <Text style={{ color: TEXT2, fontSize: 10, marginTop: 6 }}>Work in progress · Est. completion 2h</Text>
+            </View>
+          );
+        })}
+        {allComplaints.filter(c => c.status === 'in_progress').length === 0 && (
+          <View style={{ backgroundColor: CARD, borderRadius: 14, padding: 20, alignItems: 'center', borderWidth: 1, borderColor: BORDER }}>
+            <Text style={{ color: TEXT2, fontSize: 13 }}>No active work in progress.</Text>
           </View>
         )}
       </ScrollView>

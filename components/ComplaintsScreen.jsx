@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, TouchableOpacity, TextInput, FlatList } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuery } from 'platform-hooks';
 import {
@@ -12,7 +12,7 @@ import { Platform } from 'react-native';
 
 export default function ComplaintsScreen({ navigation }) {
   const insets = useSafeAreaInsets();
-  const { theme } = useApp();
+  const { theme, role } = useApp();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
   const complaintsQ = useQuery('complaints');
@@ -79,9 +79,11 @@ export default function ComplaintsScreen({ navigation }) {
         )}
         showsVerticalScrollIndicator={false}
       />
-      <TouchableOpacity onPress={() => navigation.navigate('RaiseComplaint')} style={[styles.fab, { bottom: fabBottom, backgroundColor: PRIMARY }]}>
-        <MaterialIcons name="add" size={28} color="#fff" />
-      </TouchableOpacity>
+      {role !== 'admin' && (
+        <TouchableOpacity onPress={() => navigation.navigate('RaiseComplaint')} style={[styles.fab, { bottom: fabBottom, backgroundColor: PRIMARY }]}>
+          <MaterialIcons name="add" size={28} color="#fff" />
+        </TouchableOpacity>
+      )}
     </View>
   );
 }

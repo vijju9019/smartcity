@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Platform, TextInput, Alert } from 'react-native';
-import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuery } from 'platform-hooks';
 import {
@@ -53,9 +54,11 @@ export default function HomeScreen({ navigation }) {
             <MaterialIcons name="notifications" size={26} color={TEXT} />
             <View style={{ position: 'absolute', top: -2, right: -2, width: 10, height: 10, borderRadius: 5, backgroundColor: DANGER }} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('AdminDashboard')} style={{ backgroundColor: PRIMARY + '22', borderRadius: 10, padding: 6 }}>
-            <MaterialIcons name="admin-panel-settings" size={22} color={PRIMARY} />
-          </TouchableOpacity>
+          {appCtx.role === 'admin' && (
+            <TouchableOpacity onPress={() => navigation.navigate('AdminDashboard')} style={{ backgroundColor: PRIMARY + '22', borderRadius: 10, padding: 6 }}>
+              <MaterialIcons name="admin-panel-settings" size={22} color={PRIMARY} />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: 20, paddingBottom: scrollBottom, paddingHorizontal: 16 }} showsVerticalScrollIndicator={true}>
@@ -86,9 +89,6 @@ export default function HomeScreen({ navigation }) {
                   <MaterialIcons name="admin-panel-settings" size={20} color={PRIMARY} />
                 </View>
                 <Text style={{ color: TEXT, fontSize: 17, fontWeight: 'bold' }}>Admin Management</Text>
-              </View>
-              <View style={{ backgroundColor: SUCCESS + '22', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 }}>
-                <Text style={{ color: SUCCESS, fontSize: 11, fontWeight: 'bold' }}>Admin Mode</Text>
               </View>
             </View>
 
@@ -205,18 +205,20 @@ export default function HomeScreen({ navigation }) {
           <StatCard icon="people" value={248} label="Residents" accent={ACCENT} trend={2} />
         </View>
         {/* Raise CTA */}
-        <TouchableOpacity onPress={() => navigation.navigate('RaiseComplaint')} style={{ backgroundColor: ACCENT, borderRadius: 16, padding: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
-              <MaterialIcons name="add-circle" size={26} color="#fff" />
+        {appCtx.role !== 'admin' && (
+          <TouchableOpacity onPress={() => navigation.navigate('RaiseComplaint')} style={{ backgroundColor: ACCENT, borderRadius: 16, padding: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
+                <MaterialIcons name="add-circle" size={26} color="#fff" />
+              </View>
+              <View>
+                <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold' }}>Raise a Complaint</Text>
+                <Text style={{ color: 'rgba(255,255,255,0.75)', fontSize: 12 }}>AI-powered categorization</Text>
+              </View>
             </View>
-            <View>
-              <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold' }}>Raise a Complaint</Text>
-              <Text style={{ color: 'rgba(255,255,255,0.75)', fontSize: 12 }}>AI-powered categorization</Text>
-            </View>
-          </View>
-          <MaterialIcons name="arrow-forward-ios" size={18} color="rgba(255,255,255,0.7)" />
-        </TouchableOpacity>
+            <MaterialIcons name="arrow-forward-ios" size={18} color="rgba(255,255,255,0.7)" />
+          </TouchableOpacity>
+        )}
         {/* Announcements */}
         {ANNOUNCEMENTS.map(ann => (
           <View key={ann.id} style={{ backgroundColor: ann.priority === 'high' ? DANGER + '22' : WARNING + '22', borderRadius: 12, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: ann.priority === 'high' ? DANGER + '44' : WARNING + '44', flexDirection: 'row', alignItems: 'center' }}>
@@ -232,9 +234,11 @@ export default function HomeScreen({ navigation }) {
         {/* Weekly trend header */}
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, marginTop: 8 }}>
           <Text style={{ color: TEXT, fontSize: 17, fontWeight: 'bold' }}>Weekly Trend</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Analytics')}>
-            <Text style={{ color: PRIMARY, fontSize: 13 }}>View Analytics</Text>
-          </TouchableOpacity>
+          {appCtx.role === 'admin' && (
+            <TouchableOpacity onPress={() => navigation.navigate('Analytics')}>
+              <Text style={{ color: PRIMARY, fontSize: 13 }}>View Analytics</Text>
+            </TouchableOpacity>
+          )}
         </View>
         {/* Chart */}
         <View style={{ backgroundColor: CARD, borderRadius: 16, padding: 16, marginBottom: 20, borderWidth: 1, borderColor: BORDER }}>

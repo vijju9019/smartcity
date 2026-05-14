@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Switch, Platform } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import { View, Text, ScrollView, TouchableOpacity, Switch, Platform, Alert } from 'react-native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PRIMARY, ACCENT, CARD, SUCCESS, WARNING, DANGER, SECONDARY, TEXT, TEXT2, BORDER, TAB_MENU_HEIGHT, SCROLL_EXTRA_PADDING, WEB_TAB_MENU_PADDING, useApp } from './core';
 
@@ -18,18 +18,32 @@ const BADGES = [
 export default function ProfileScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const appCtx = useApp();
-  const { theme, role, darkMode, setDarkMode } = appCtx;
+  const { theme, role } = appCtx;
   const scrollBottom = Platform.OS === 'web' ? WEB_TAB_MENU_PADDING : TAB_MENU_HEIGHT + insets.bottom + SCROLL_EXTRA_PADDING;
 
   const MENU_ITEMS = [
     { icon: 'notifications', label: 'Notifications', action: () => navigation.navigate('Notifications') },
-    { icon: 'analytics', label: 'Analytics', action: () => navigation.navigate('Analytics') },
-    { icon: 'admin-panel-settings', label: 'Admin Dashboard', action: () => navigation.navigate('AdminDashboard') },
-    { icon: 'dark-mode', label: 'Dark Mode', isSwitch: true, value: darkMode, onChange: setDarkMode },
+    { icon: 'analytics', label: 'Analytics', action: () => navigation.navigate('Analytics'), adminOnly: true },
+    { icon: 'admin-panel-settings', label: 'Admin Dashboard', action: () => navigation.navigate('AdminDashboard'), adminOnly: true },
     { icon: 'share', label: 'Share ColonyCare', action: () => {} },
     { icon: 'info', label: 'About', action: () => {} },
-    { icon: 'logout', label: 'Logout', action: () => {}, danger: true },
-  ];
+    { icon: 'logout', label: 'Logout', action: () => {
+      const doLogout = () => {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Signup' }],
+        });
+      };
+      if (Platform.OS === 'web') {
+        if (confirm('Are you sure you want to logout?')) doLogout();
+      } else {
+        Alert.alert('Logout', 'Are you sure you want to logout?', [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Logout', style: 'destructive', onPress: doLogout }
+        ]);
+      }
+    }, danger: true },
+  ].filter(item => !item.adminOnly || role === 'admin');
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: theme.bg }} contentContainerStyle={{ paddingBottom: scrollBottom }} showsVerticalScrollIndicator={true}>
@@ -56,17 +70,21 @@ export default function ProfileScreen({ navigation }) {
       </View>
       <View style={{ padding: 20 }}>
         {/* Badges */}
-        <Text style={{ color: TEXT2, fontSize: 12, fontWeight: '700', letterSpacing: 1, marginBottom: 12, textTransform: 'uppercase' }}>Badges</Text>
-        <View style={{ flexDirection: 'row', marginBottom: 24 }}>
-          {BADGES.map((badge, i) => (
-            <View key={i} style={{ flex: 1, backgroundColor: CARD, borderRadius: 12, padding: 12, alignItems: 'center', marginHorizontal: 4, borderWidth: 1, borderColor: badge.color + '44' }}>
-              <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: badge.color + '22', justifyContent: 'center', alignItems: 'center', marginBottom: 6 }}>
-                <MaterialIcons name={badge.icon} size={22} color={badge.color} />
-              </View>
-              <Text style={{ color: TEXT2, fontSize: 10, textAlign: 'center' }}>{badge.label}</Text>
+        {role !== 'admin' && (
+          <>
+            <Text style={{ color: TEXT2, fontSize: 12, fontWeight: '700', letterSpacing: 1, marginBottom: 12, textTransform: 'uppercase' }}>Badges</Text>
+            <View style={{ flexDirection: 'row', marginBottom: 24 }}>
+              {BADGES.map((badge, i) => (
+                <View key={i} style={{ flex: 1, backgroundColor: CARD, borderRadius: 12, padding: 12, alignItems: 'center', marginHorizontal: 4, borderWidth: 1, borderColor: badge.color + '44' }}>
+                  <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: badge.color + '22', justifyContent: 'center', alignItems: 'center', marginBottom: 6 }}>
+                    <MaterialIcons name={badge.icon} size={22} color={badge.color} />
+                  </View>
+                  <Text style={{ color: TEXT2, fontSize: 10, textAlign: 'center' }}>{badge.label}</Text>
+                </View>
+              ))}
             </View>
-          ))}
-        </View>
+          </>
+        )}
         {/* Settings */}
         <Text style={{ color: TEXT2, fontSize: 12, fontWeight: '700', letterSpacing: 1, marginBottom: 12, textTransform: 'uppercase' }}>Settings</Text>
         <View style={{ backgroundColor: CARD, borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: BORDER }}>

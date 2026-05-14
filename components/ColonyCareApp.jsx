@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Platform, StatusBar } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer, NavigationIndependentTree } from '@react-navigation/native';
@@ -19,6 +19,7 @@ import AnalyticsScreen from './AnalyticsScreen';
 import MapViewScreen from './MapViewScreen';
 import NotificationsScreen from './NotificationsScreen';
 import SignupScreen from './SignupScreen';
+import LoginScreen from './LoginScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -94,7 +95,8 @@ function AppNavigator() {
   return (
     <AppProvider>
       <StatusBar barStyle="light-content" backgroundColor={BG} />
-      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Signup">
+      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Login">
+        <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Signup" component={SignupScreen} />
         <Stack.Screen name="MainApp" component={TabNavigator} />
         <Stack.Screen name="RaiseComplaint" component={RaiseComplaintScreen} />

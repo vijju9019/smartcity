@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Dimensions } from 'react-native';
-import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PRIMARY, BG, CARD, TEXT, TEXT2, BORDER, ACCENT, SECONDARY, SUCCESS, useApp } from './core';
 
@@ -60,23 +61,10 @@ export default function SignupScreen({ navigation }) {
             <View style={{ flexDirection: 'row', marginBottom: 20 }}>
               <TouchableOpacity 
                 onPress={handleGoogleLogin}
-                style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', borderRadius: 12, paddingVertical: 12, marginRight: 6 }}
+                style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', borderRadius: 12, paddingVertical: 12 }}
               >
                 <MaterialCommunityIcons name="google" size={18} color="#EA4335" />
-                <Text style={{ color: '#000', fontSize: 12, fontWeight: 'bold', marginLeft: 8 }}>Google</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity 
-                onPress={() => {
-                  setUserName('Phone User');
-                  setUserEmail('+91 98765 43210');
-                  setRole('resident');
-                  navigation.replace('MainApp');
-                }}
-                style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: PRIMARY, borderRadius: 12, paddingVertical: 12, marginLeft: 6 }}
-              >
-                <MaterialIcons name="phone" size={18} color="#fff" />
-                <Text style={{ color: '#fff', fontSize: 12, fontWeight: 'bold', marginLeft: 8 }}>Phone</Text>
+                <Text style={{ color: '#000', fontSize: 12, fontWeight: 'bold', marginLeft: 8 }}>Sign up with Google</Text>
               </TouchableOpacity>
             </View>
 
@@ -137,6 +125,20 @@ export default function SignupScreen({ navigation }) {
               </View>
             </View>
 
+            <View style={{ marginBottom: 14 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: BG, borderRadius: 12, borderWidth: 1, borderColor: BORDER, paddingHorizontal: 12 }}>
+                <MaterialIcons name="phone" size={20} color={TEXT2} />
+                <TextInput 
+                  value={phone}
+                  onChangeText={setPhone}
+                  placeholder="Phone Number"
+                  placeholderTextColor={TEXT2 + '66'}
+                  keyboardType="phone-pad"
+                  style={{ flex: 1, paddingVertical: 10, paddingHorizontal: 10, color: TEXT, fontSize: 14 }}
+                />
+              </View>
+            </View>
+
             <View style={{ marginBottom: 20 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: BG, borderRadius: 12, borderWidth: 1, borderColor: BORDER, paddingHorizontal: 12 }}>
                 <MaterialIcons name="lock-outline" size={20} color={TEXT2} />
@@ -159,7 +161,7 @@ export default function SignupScreen({ navigation }) {
             </TouchableOpacity>
 
             <TouchableOpacity 
-              onPress={() => navigation.replace('MainApp')}
+              onPress={() => navigation.navigate('Login')}
               style={{ marginTop: 16, alignItems: 'center' }}
             >
               <Text style={{ color: TEXT2, fontSize: 13 }}>Already have an account? <Text style={{ color: PRIMARY, fontWeight: 'bold' }}>Login</Text></Text>
