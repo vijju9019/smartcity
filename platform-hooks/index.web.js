@@ -2,6 +2,7 @@
  * platform-hooks/index.web.js
  * Web-specific shim for platform-hooks.
  * Excludes native-only modules like react-native-maps.
+ * Provides useQuery, useMutation, useCamera, useLocation, useShare, useMaps, useFilePicker, useImagePicker
  */
 const React = require('react');
 const { useState, useCallback, useEffect, useRef } = React;
@@ -76,11 +77,66 @@ function useCamera() {
 
   const takePhoto = useCallback(function() {
     return new Promise(function(resolve) {
-      resolve({ error: 'Camera not available on web. Please use Upload File instead.' });
+      try {
+        var ImagePicker = require('expo-image-picker');
+        ImagePicker.requestCameraPermissionsAsync().then(function(perm) {
+          if (!perm.granted) { resolve({ error: 'Camera permission denied.' }); return; }
+          ImagePicker.launchCameraAsync({ 
+            mediaTypes: ImagePicker.MediaTypeOptions.Images, 
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 0.8 
+          }).then(function(result) {
+            if (!result.canceled && result.assets && result.assets[0]) {
+              var asset = result.assets[0];
+              setPhoto(asset);
+              resolve({ uri: asset.uri, width: asset.width, height: asset.height });
+            } else {
+              resolve({ error: 'Camera cancelled.' });
+            }
+          }).catch(function(e) { resolve({ error: e.message }); });
+        }).catch(function(e) { resolve({ error: e.message }); });
+      } catch(e) {
+        resolve({ error: 'Camera unavailable: ' + e.message });
+      }
     });
   }, []);
 
   return { takePhoto: takePhoto, photo: photo };
+}
+
+// ─── useImagePicker ──────────────────────────────────────────────────────────
+function useImagePicker() {
+  const [lastImage, setLastImage] = useState(null);
+
+  const pickImage = useCallback(function() {
+    return new Promise(function(resolve) {
+      try {
+        var ImagePicker = require('expo-image-picker');
+        ImagePicker.requestMediaLibraryPermissionsAsync().then(function(perm) {
+          if (!perm.granted) { resolve({ error: 'Gallery permission denied.' }); return; }
+          ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 0.8,
+          }).then(function(result) {
+            if (!result.canceled && result.assets && result.assets[0]) {
+              var asset = result.assets[0];
+              setLastImage(asset);
+              resolve({ uri: asset.uri, width: asset.width, height: asset.height });
+            } else {
+              resolve({ error: 'Picker cancelled.' });
+            }
+          }).catch(function(e) { resolve({ error: e.message }); });
+        }).catch(function(e) { resolve({ error: e.message }); });
+      } catch(e) {
+        resolve({ error: 'Picker unavailable: ' + e.message });
+      }
+    });
+  }, []);
+
+  return { pickImage: pickImage, lastImage: lastImage };
 }
 
 // ─── useLocation ─────────────────────────────────────────────────────────────
@@ -201,4 +257,5 @@ module.exports = {
   useShare: useShare,
   useMaps: useMaps,
   useFilePicker: useFilePicker,
+  useImagePicker: useImagePicker,
 };

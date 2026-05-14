@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, ActivityIndicator, Image, Alert, Platform, KeyboardAvoidingView, Dimensions } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useCamera, useLocation, useFilePicker, useMutation } from 'platform-hooks';
+import { useCamera, useLocation, useFilePicker, useImagePicker, useMutation } from 'platform-hooks';
 import {
   PRIMARY, ACCENT, BG, CARD, SECONDARY, TEXT, TEXT2, BORDER,
   CATEGORIES, HEADER_HEIGHT, analyzeComplaintAI, generateId, getPriorityColor,
@@ -25,6 +25,7 @@ export default function RaiseComplaintScreen({ navigation, route }) {
   const { takePhoto, photo: cameraPhoto } = useCamera();
   const { getCurrentLocation } = useLocation();
   const { pickDocument, lastFile, isLoading: fpLoading } = useFilePicker();
+  const { pickImage, lastImage, isLoading: ipLoading } = useImagePicker();
   const { mutate } = useMutation('complaints', 'insert');
 
   React.useEffect(() => {
@@ -39,6 +40,7 @@ export default function RaiseComplaintScreen({ navigation, route }) {
   }, [route.params]);
 
   React.useEffect(() => { if (cameraPhoto) setPhoto(cameraPhoto.uri); }, [cameraPhoto]);
+  React.useEffect(() => { if (lastImage) setPhoto(lastImage.uri); }, [lastImage]);
 
   const handleGetLocation = useCallback(() => {
     getCurrentLocation().then(r => {
@@ -57,7 +59,7 @@ export default function RaiseComplaintScreen({ navigation, route }) {
   const handleSubmit = useCallback(() => {
     if (!title.trim() || !description.trim() || !category) { Platform.OS === 'web' ? alert('Fill all required fields.') : Alert.alert('Missing Info', 'Fill all required fields.'); return; }
     setSubmitting(true);
-    const nc = { id: generateId(), title: title.trim(), description: description.trim(), category, status: 'pending', priority, location: location || 'Not specified', worker_id: null, created_at: Date.now(), updated_at: Date.now(), upvotes: 0, photo: photo || (lastFile ? lastFile.uri : null), lat, lng, ai_risk: aiResult ? aiResult.risk : 'Medium', ai_category: aiResult ? aiResult.suggestion : '', resolution_notes: '' };
+    const nc = { id: generateId(), title: title.trim(), description: description.trim(), category, status: 'pending', priority, location: location || 'Not specified', worker_id: null, created_at: Date.now(), updated_at: Date.now(), upvotes: 0, photo: photo || (lastImage ? lastImage.uri : (lastFile ? lastFile.uri : null)), lat, lng, ai_risk: aiResult ? aiResult.risk : 'Medium', ai_category: aiResult ? aiResult.suggestion : '', resolution_notes: '' };
     mutate(nc).then(() => {
       setSubmitting(false);
       Platform.OS === 'web' ? alert('Complaint submitted! ID: ' + nc.id) : Alert.alert('Success! 🎉', 'Submitted.\nID: ' + nc.id, [{ text: 'OK', onPress: () => navigation.goBack() }]);
@@ -121,9 +123,9 @@ export default function RaiseComplaintScreen({ navigation, route }) {
               <MaterialIcons name="camera-alt" size={26} color={PRIMARY} />
               <Text style={{ color: TEXT2, fontSize: 11, marginTop: 6, textAlign: 'center' }}>Take Photo</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => pickDocument({ type: ['image/*','video/*'] })} style={{ flex: 1, margin: 4, backgroundColor: CARD, borderRadius: 12, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: BORDER, borderStyle: 'dashed' }}>
-              {fpLoading ? <ActivityIndicator size="small" color={ACCENT} /> : <MaterialIcons name="upload-file" size={26} color={ACCENT} />}
-              <Text style={{ color: TEXT2, fontSize: 11, marginTop: 6, textAlign: 'center' }}>Upload File</Text>
+            <TouchableOpacity onPress={() => pickImage()} style={{ flex: 1, margin: 4, backgroundColor: CARD, borderRadius: 12, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: BORDER, borderStyle: 'dashed' }}>
+              {ipLoading ? <ActivityIndicator size="small" color={ACCENT} /> : <MaterialIcons name="photo-library" size={26} color={ACCENT} />}
+              <Text style={{ color: TEXT2, fontSize: 11, marginTop: 6, textAlign: 'center' }}>Gallery</Text>
             </TouchableOpacity>
           </View>
           {(photo || lastFile?.uri) && (
