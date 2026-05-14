@@ -17,6 +17,9 @@ export default function HomeScreen({ navigation }) {
   const { theme = { bg: '#0F172A', card: '#1E293B' }, role = 'resident', userName = 'User' } = appCtx;
   const [workerName, setWorkerName] = useState('');
   const [workerDept, setWorkerDept] = useState('');
+  const [workerEmail, setWorkerEmail] = useState('');
+  const [workerPhone, setWorkerPhone] = useState('');
+  const [workerLocation, setWorkerLocation] = useState('');
   const complaintsQ = useQuery('complaints');
   const complaints = useMemo(() => (complaintsQ.data?.length > 0 ? complaintsQ.data : SEED_COMPLAINTS), [complaintsQ.data]);
   const stats = useMemo(() => {
@@ -95,14 +98,15 @@ export default function HomeScreen({ navigation }) {
 
             <View style={{ marginBottom: 12 }}>
               <Text style={{ color: TEXT2, fontSize: 11, fontWeight: '700', letterSpacing: 1, marginBottom: 10, textTransform: 'uppercase' }}>New Worker Details</Text>
-              <View style={{ flexDirection: 'row', marginBottom: 16 }}>
-                <View style={{ flex: 2, marginRight: 6 }}>
+              
+              <View style={{ flexDirection: 'row', marginBottom: 12 }}>
+                <View style={{ flex: 1, marginRight: 6 }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: BG, borderRadius: 10, borderWidth: 1, borderColor: BORDER, paddingHorizontal: 10 }}>
-                    <MaterialIcons name="person" size={18} color={TEXT2} />
+                    <MaterialIcons name="person" size={16} color={TEXT2} />
                     <TextInput 
                       value={workerName}
                       onChangeText={setWorkerName}
-                      placeholder="Worker Name" 
+                      placeholder="Name" 
                       placeholderTextColor={TEXT2 + '66'} 
                       style={{ flex: 1, color: TEXT, fontSize: 13, paddingVertical: 10, paddingHorizontal: 8 }}
                     />
@@ -110,7 +114,7 @@ export default function HomeScreen({ navigation }) {
                 </View>
                 <View style={{ flex: 1, marginLeft: 6 }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: BG, borderRadius: 10, borderWidth: 1, borderColor: BORDER, paddingHorizontal: 10 }}>
-                    <MaterialIcons name="groups" size={18} color={TEXT2} />
+                    <MaterialIcons name="work" size={16} color={TEXT2} />
                     <TextInput 
                       value={workerDept}
                       onChangeText={setWorkerDept}
@@ -122,19 +126,62 @@ export default function HomeScreen({ navigation }) {
                 </View>
               </View>
 
+              <View style={{ flexDirection: 'row', marginBottom: 12 }}>
+                <View style={{ flex: 1, marginRight: 6 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: BG, borderRadius: 10, borderWidth: 1, borderColor: BORDER, paddingHorizontal: 10 }}>
+                    <MaterialIcons name="mail" size={16} color={TEXT2} />
+                    <TextInput 
+                      value={workerEmail}
+                      onChangeText={setWorkerEmail}
+                      placeholder="Email" 
+                      placeholderTextColor={TEXT2 + '66'} 
+                      keyboardType="email-address"
+                      style={{ flex: 1, color: TEXT, fontSize: 13, paddingVertical: 10, paddingHorizontal: 8 }}
+                    />
+                  </View>
+                </View>
+                <View style={{ flex: 1, marginLeft: 6 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: BG, borderRadius: 10, borderWidth: 1, borderColor: BORDER, paddingHorizontal: 10 }}>
+                    <MaterialIcons name="phone" size={16} color={TEXT2} />
+                    <TextInput 
+                      value={workerPhone}
+                      onChangeText={setWorkerPhone}
+                      placeholder="Phone" 
+                      placeholderTextColor={TEXT2 + '66'} 
+                      keyboardType="phone-pad"
+                      style={{ flex: 1, color: TEXT, fontSize: 13, paddingVertical: 10, paddingHorizontal: 8 }}
+                    />
+                  </View>
+                </View>
+              </View>
+
+              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: BG, borderRadius: 10, borderWidth: 1, borderColor: BORDER, paddingHorizontal: 10, marginBottom: 16 }}>
+                <MaterialIcons name="location-on" size={16} color={TEXT2} />
+                <TextInput 
+                  value={workerLocation}
+                  onChangeText={setWorkerLocation}
+                  placeholder="Assigned Working Area / Block" 
+                  placeholderTextColor={TEXT2 + '66'} 
+                  style={{ flex: 1, color: TEXT, fontSize: 13, paddingVertical: 10, paddingHorizontal: 8 }}
+                />
+              </View>
+
               <TouchableOpacity 
                 onPress={() => {
-                  if (workerName && workerDept) {
-                    Platform.OS === 'web' ? alert(`Worker ${workerName} added to ${workerDept}!`) : Alert.alert('Success', `Worker ${workerName} added.`);
+                  if (workerName && workerDept && workerEmail && workerPhone && workerLocation) {
+                    Platform.OS === 'web' ? alert(`Worker ${workerName} registered successfully!`) : Alert.alert('Success', `Worker ${workerName} added.`);
                     setWorkerName('');
                     setWorkerDept('');
+                    setWorkerEmail('');
+                    setWorkerPhone('');
+                    setWorkerLocation('');
                   } else {
                     Platform.OS === 'web' ? alert('Please fill all fields') : Alert.alert('Error', 'Please fill all fields');
                   }
                 }}
                 style={{ backgroundColor: SUCCESS, borderRadius: 12, paddingVertical: 12, alignItems: 'center', shadowColor: SUCCESS, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 6, elevation: 4 }}
               >
-                <Text style={{ color: '#fff', fontSize: 14, fontWeight: 'bold' }}>Add Worker</Text>
+                <Text style={{ color: '#fff', fontSize: 14, fontWeight: 'bold' }}>Register Worker</Text>
               </TouchableOpacity>
             </View>
           </View>

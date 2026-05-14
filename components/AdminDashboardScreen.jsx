@@ -37,15 +37,15 @@ export default function AdminDashboardScreen({ navigation }) {
       .catch(e => { Platform.OS === 'web' ? alert(e.message) : Alert.alert('Error', e.message); });
   }, [updateComplaint]);
 
-  const [newWorker, setNewWorker] = React.useState({ name: '', dept: '' });
+  const [newWorker, setNewWorker] = React.useState({ name: '', dept: '', email: '', phone: '', location: '' });
 
   const handleAddWorker = () => {
-    if (!newWorker.name || !newWorker.dept) {
+    if (!newWorker.name || !newWorker.dept || !newWorker.email || !newWorker.phone || !newWorker.location) {
       Platform.OS === 'web' ? alert('Please fill all fields') : Alert.alert('Error', 'Please fill all fields');
       return;
     }
-    Platform.OS === 'web' ? alert(`Worker ${newWorker.name} added!`) : Alert.alert('Success', `Worker ${newWorker.name} added.`);
-    setNewWorker({ name: '', dept: '' });
+    Platform.OS === 'web' ? alert(`Worker ${newWorker.name} registered successfully!`) : Alert.alert('Success', `Worker ${newWorker.name} added.`);
+    setNewWorker({ name: '', dept: '', email: '', phone: '', location: '' });
   };
 
   return (
@@ -90,7 +90,7 @@ export default function AdminDashboardScreen({ navigation }) {
               </View>
               <Text style={{ color: TEXT, fontSize: 14, fontWeight: '700' }}>Add New Worker</Text>
             </View>
-            <View style={{ flexDirection: 'row' }}>
+            <View style={{ flexDirection: 'row', marginBottom: 10 }}>
               <TextInput 
                 placeholder="Name" 
                 placeholderTextColor={TEXT2 + '88'} 
@@ -106,7 +106,32 @@ export default function AdminDashboardScreen({ navigation }) {
                 style={{ flex: 1, backgroundColor: BG, borderRadius: 8, padding: 10, color: TEXT, fontSize: 12, borderWidth: 1, borderColor: BORDER }} 
               />
             </View>
-            <TouchableOpacity onPress={handleAddWorker} style={{ backgroundColor: SUCCESS, borderRadius: 10, paddingVertical: 12, alignItems: 'center', marginTop: 12 }}>
+            <View style={{ flexDirection: 'row', marginBottom: 10 }}>
+              <TextInput 
+                placeholder="Email Address" 
+                placeholderTextColor={TEXT2 + '88'} 
+                value={newWorker.email}
+                onChangeText={(t) => setNewWorker({...newWorker, email: t})}
+                keyboardType="email-address"
+                style={{ flex: 1, backgroundColor: BG, borderRadius: 8, padding: 10, color: TEXT, fontSize: 12, marginRight: 8, borderWidth: 1, borderColor: BORDER }} 
+              />
+              <TextInput 
+                placeholder="Phone Number" 
+                placeholderTextColor={TEXT2 + '88'} 
+                value={newWorker.phone}
+                onChangeText={(t) => setNewWorker({...newWorker, phone: t})}
+                keyboardType="phone-pad"
+                style={{ flex: 1, backgroundColor: BG, borderRadius: 8, padding: 10, color: TEXT, fontSize: 12, borderWidth: 1, borderColor: BORDER }} 
+              />
+            </View>
+            <TextInput 
+              placeholder="Assigned Location / Working Area" 
+              placeholderTextColor={TEXT2 + '88'} 
+              value={newWorker.location}
+              onChangeText={(t) => setNewWorker({...newWorker, location: t})}
+              style={{ backgroundColor: BG, borderRadius: 8, padding: 10, color: TEXT, fontSize: 12, marginBottom: 12, borderWidth: 1, borderColor: BORDER }} 
+            />
+            <TouchableOpacity onPress={handleAddWorker} style={{ backgroundColor: SUCCESS, borderRadius: 10, paddingVertical: 12, alignItems: 'center' }}>
               <Text style={{ color: '#fff', fontSize: 13, fontWeight: 'bold' }}>Register Worker</Text>
             </TouchableOpacity>
           </View>
