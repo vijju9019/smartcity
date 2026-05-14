@@ -41,7 +41,6 @@ export default function SignupScreen({ navigation }) {
 
   const ROLES = [
     { id: 'resident', label: 'Resident', icon: 'person', color: PRIMARY },
-    { id: 'admin', label: 'Admin', icon: 'admin-panel-settings', color: ACCENT },
     { id: 'worker', label: 'Worker', icon: 'engineering', color: SUCCESS },
   ];
 

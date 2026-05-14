@@ -1,143 +1,186 @@
-import React, { useState, useMemo } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Platform, ActivityIndicator, Image } from 'react-native';
+import React, { useState, useMemo, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Platform, StyleSheet } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuery, useMutation } from 'platform-hooks';
 import { 
-  PRIMARY, ACCENT, BG, CARD, SUCCESS, WARNING, DANGER, SECONDARY, TEXT, TEXT2, BORDER, 
   SEED_COMPLAINTS, getPriorityColor, getStatusLabel, formatTime 
 } from './core';
 
+// Worker-Specific Design System
+const WORKER_BG = '#0F1115';
+const WORKER_CARD = '#1A1D23';
+const WORKER_PRIMARY = '#F59E0B'; 
+const WORKER_SECONDARY = '#3B82F6'; 
+const WORKER_SUCCESS = '#10B981'; 
+const WORKER_DANGER = '#EF4444'; 
+const WORKER_TEXT = '#E5E7EB';
+const WORKER_TEXT2 = '#9CA3AF';
+const WORKER_BORDER = '#2D333D';
+
 export default function MyTasksScreen({ navigation }) {
   const insets = useSafeAreaInsets();
-  const [activeTab, setActiveTab] = useState('assigned');
-  
-  // Simulation: We are logged in as Worker "w1" (Electrician/Plumber)
-  const workerId = 'w1'; 
-  
+  const [activeTab, setActiveTab] = useState('queue'); // Default to Queue
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const currentWorkerId = 'w1'; 
   const complaintsQ = useQuery('complaints');
   const { mutate: updateStatus } = useMutation('complaints', 'update');
-  
   const allComplaints = useMemo(() => (complaintsQ.data?.length > 0 ? complaintsQ.data : SEED_COMPLAINTS), [complaintsQ.data]);
   
-  const myTasks = useMemo(() => {
-    // Filter by worker_id and tab status
-    const assignedToMe = allComplaints.filter(c => c.worker_id === workerId);
-    if (activeTab === 'assigned') return assignedToMe.filter(c => c.status === 'pending');
-    if (activeTab === 'active') return assignedToMe.filter(c => c.status === 'in_progress');
-    if (activeTab === 'completed') return assignedToMe.filter(c => c.status === 'resolved');
-    return assignedToMe;
-  }, [allComplaints, activeTab, workerId]);
+  const filteredTasks = useMemo(() => {
+    if (activeTab === 'queue') {
+      // "Raised Complaints" - All pending issues in the community that any worker can pick up
+      return allComplaints.filter(c => c.status === 'pending');
+    }
+    if (activeTab === 'my_tasks') {
+      // "Admin Assigned" - Specifically assigned to THIS worker
+      return allComplaints.filter(c => c.worker_id === currentWorkerId && c.status === 'in_progress');
+    }
+    if (activeTab === 'history') {
+      return allComplaints.filter(c => c.worker_id === currentWorkerId && c.status === 'resolved');
+    }
+    return [];
+  }, [allComplaints, activeTab, currentWorkerId]);
 
-  const handleUpdateStatus = (id, newStatus) => {
-    updateStatus({ id, data: { status: newStatus, updated_at: Date.now() } });
+  const handleAcceptTask = (id) => {
+    // Assign to self and move to in_progress
+    updateStatus({ id, data: { worker_id: currentWorkerId, status: 'in_progress', updated_at: Date.now() } });
+  };
+
+  const handleResolveTask = (id) => {
+    updateStatus({ id, data: { status: 'resolved', updated_at: Date.now() } });
   };
 
   const TABS = [
-    { key: 'assigned', label: 'Assigned', icon: 'assignment' },
-    { key: 'active', label: 'Active', icon: 'engineering' },
-    { key: 'completed', label: 'Done', icon: 'check-circle' }
+    { key: 'queue', label: 'RAISED ISSUES', icon: 'list-alt', count: allComplaints.filter(c => c.status === 'pending').length },
+    { key: 'my_tasks', label: 'ASSIGNED TO ME', icon: 'engineering', count: allComplaints.filter(c => c.worker_id === currentWorkerId && c.status === 'in_progress').length },
+    { key: 'history', label: 'MY HISTORY', icon: 'history', count: allComplaints.filter(c => c.worker_id === currentWorkerId && c.status === 'resolved').length }
   ];
 
   return (
-    <View style={{ flex: 1, backgroundColor: BG }}>
+    <View style={{ flex: 1, backgroundColor: WORKER_BG }}>
       {/* Header */}
-      <View style={{ paddingTop: insets.top + 8, paddingBottom: 16, paddingHorizontal: 20, backgroundColor: BG, borderBottomWidth: 1, borderBottomColor: BORDER }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+      <View style={{ paddingTop: insets.top + 10, paddingBottom: 20, paddingHorizontal: 20, backgroundColor: WORKER_CARD, borderBottomWidth: 3, borderBottomColor: WORKER_PRIMARY }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <View>
-            <Text style={{ color: TEXT, fontSize: 22, fontWeight: 'bold' }}>Worker Portal</Text>
-            <Text style={{ color: TEXT2, fontSize: 13 }}>Logged in as: John Doe (Electrician)</Text>
+            <Text style={{ color: WORKER_PRIMARY, fontSize: 10, fontWeight: '900', letterSpacing: 1.5 }}>WORKER DASHBOARD</Text>
+            <Text style={{ color: WORKER_TEXT, fontSize: 22, fontWeight: 'bold' }}>John Doe</Text>
+            <Text style={{ color: WORKER_TEXT2, fontSize: 11 }}>SECTOR: RESIDENCY MAINTENANCE</Text>
           </View>
-          <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: PRIMARY + '22', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: PRIMARY + '44' }}>
-            <MaterialIcons name="engineering" size={24} color={PRIMARY} />
+          <View style={{ alignItems: 'flex-end' }}>
+            <Text style={{ color: WORKER_TEXT, fontSize: 16, fontWeight: 'bold', fontFamily: 'monospace' }}>
+              {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+              <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: WORKER_SUCCESS, marginRight: 6 }} />
+              <Text style={{ color: WORKER_SUCCESS, fontSize: 10, fontWeight: 'bold' }}>ACTIVE</Text>
+            </View>
           </View>
-        </View>
-
-        {/* Custom Tab Bar */}
-        <View style={{ flexDirection: 'row', backgroundColor: CARD, borderRadius: 16, padding: 4, borderWidth: 1, borderColor: BORDER }}>
-          {TABS.map(t => (
-            <TouchableOpacity 
-              key={t.key} 
-              onPress={() => setActiveTab(t.key)}
-              style={{ 
-                flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', 
-                paddingVertical: 10, borderRadius: 12,
-                backgroundColor: activeTab === t.key ? PRIMARY : 'transparent'
-              }}
-            >
-              <MaterialIcons name={t.icon} size={18} color={activeTab === t.key ? '#fff' : TEXT2} />
-              <Text style={{ color: activeTab === t.key ? '#fff' : TEXT2, fontSize: 13, fontWeight: 'bold', marginLeft: 6 }}>{t.label}</Text>
-            </TouchableOpacity>
-          ))}
         </View>
       </View>
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: 100 }}>
-        {myTasks.length === 0 ? (
-          <View style={{ alignItems: 'center', marginTop: 60 }}>
-            <MaterialCommunityIcons name="clipboard-check-outline" size={80} color={BORDER} />
-            <Text style={{ color: TEXT2, fontSize: 16, fontWeight: 'bold', marginTop: 16 }}>No tasks found</Text>
-            <Text style={{ color: TEXT2, fontSize: 13, marginTop: 4 }}>You're all caught up for now!</Text>
+      {/* Industrial Tabs */}
+      <View style={{ flexDirection: 'row', backgroundColor: '#000' }}>
+        {TABS.map(t => (
+          <TouchableOpacity 
+            key={t.key} 
+            onPress={() => setActiveTab(t.key)}
+            style={{ 
+              flex: 1, alignItems: 'center', justifyContent: 'center', 
+              paddingVertical: 14, 
+              borderBottomWidth: 3,
+              borderBottomColor: activeTab === t.key ? WORKER_PRIMARY : 'transparent',
+              backgroundColor: activeTab === t.key ? WORKER_CARD : 'transparent'
+            }}
+          >
+            <View style={{ position: 'relative' }}>
+              <MaterialIcons name={t.icon} size={20} color={activeTab === t.key ? WORKER_PRIMARY : WORKER_TEXT2} />
+              {t.count > 0 && (
+                <View style={{ position: 'absolute', top: -10, right: -12, backgroundColor: t.key === 'queue' ? WORKER_DANGER : WORKER_PRIMARY, borderRadius: 10, minWidth: 16, height: 16, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#000' }}>
+                  <Text style={{ color: '#fff', fontSize: 8, fontWeight: 'bold' }}>{t.count}</Text>
+                </View>
+              )}
+            </View>
+            <Text style={{ color: activeTab === t.key ? WORKER_TEXT : WORKER_TEXT2, fontSize: 9, fontWeight: 'bold', marginTop: 4 }}>{t.label}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
+        <View style={{ marginBottom: 16, flexDirection: 'row', alignItems: 'center' }}>
+          <MaterialIcons name="info-outline" size={16} color={WORKER_TEXT2} />
+          <Text style={{ color: WORKER_TEXT2, fontSize: 12, marginLeft: 8 }}>
+            {activeTab === 'queue' ? 'Showing all complaints raised by residents.' : 
+             activeTab === 'my_tasks' ? 'Tasks assigned to you by admin or accepted from queue.' : 
+             'Your completed assignments history.'}
+          </Text>
+        </View>
+
+        {filteredTasks.length === 0 ? (
+          <View style={{ alignItems: 'center', marginTop: 80, opacity: 0.4 }}>
+            <MaterialCommunityIcons name="clipboard-check" size={70} color={WORKER_TEXT2} />
+            <Text style={{ color: WORKER_TEXT2, fontSize: 14, fontWeight: 'bold', marginTop: 16 }}>NO PENDING ENTRIES</Text>
           </View>
         ) : (
-          myTasks.map(task => (
-            <View key={task.id} style={{ backgroundColor: CARD, borderRadius: 20, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: BORDER }}>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-                <View style={{ flex: 1 }}>
+          filteredTasks.map(task => (
+            <View key={task.id} style={{ backgroundColor: WORKER_CARD, borderRadius: 4, marginBottom: 16, borderWidth: 1, borderColor: WORKER_BORDER, overflow: 'hidden' }}>
+              <View style={{ backgroundColor: '#23272F', padding: 10, flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: WORKER_BORDER }}>
+                <Text style={{ color: WORKER_PRIMARY, fontSize: 11, fontWeight: 'bold' }}>#{task.id}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: getPriorityColor(task.priority), marginRight: 6 }} />
+                  <Text style={{ color: getPriorityColor(task.priority), fontSize: 10, fontWeight: '900' }}>{task.priority.toUpperCase()}</Text>
+                </View>
+              </View>
+
+              <View style={{ padding: 15 }}>
+                <Text style={{ color: WORKER_TEXT, fontSize: 17, fontWeight: 'bold', marginBottom: 8 }}>{task.title}</Text>
+                
+                <View style={{ backgroundColor: WORKER_BG, padding: 10, borderRadius: 4, marginBottom: 12, borderLeftWidth: 3, borderLeftColor: WORKER_PRIMARY }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
-                    <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: getPriorityColor(task.priority), marginRight: 8 }} />
-                    <Text style={{ color: TEXT, fontSize: 16, fontWeight: 'bold' }}>{task.title}</Text>
+                    <MaterialIcons name="location-on" size={14} color={WORKER_DANGER} />
+                    <Text style={{ color: WORKER_TEXT, fontSize: 13, fontWeight: 'bold', marginLeft: 4 }}>{task.location}</Text>
                   </View>
-                  <Text style={{ color: TEXT2, fontSize: 13 }}>ID: #{task.id} · {formatTime(task.created_at)}</Text>
+                  <Text style={{ color: WORKER_TEXT2, fontSize: 13, lineHeight: 18 }}>{task.description}</Text>
                 </View>
-                <View style={{ backgroundColor: getPriorityColor(task.priority) + '15', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4, borderWidth: 1, borderColor: getPriorityColor(task.priority) + '33' }}>
-                  <Text style={{ color: getPriorityColor(task.priority), fontSize: 11, fontWeight: 'bold' }}>{task.priority.toUpperCase()}</Text>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+                  <Text style={{ color: WORKER_TEXT2, fontSize: 11 }}>RAISED: {formatTime(task.created_at)}</Text>
+                  
+                  {activeTab === 'queue' && (
+                    <TouchableOpacity 
+                      onPress={() => handleAcceptTask(task.id)}
+                      style={{ backgroundColor: WORKER_PRIMARY, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 4 }}
+                    >
+                      <Text style={{ color: '#000', fontSize: 12, fontWeight: 'bold' }}>ACCEPT TASK</Text>
+                    </TouchableOpacity>
+                  )}
+
+                  {activeTab === 'my_tasks' && (
+                    <TouchableOpacity 
+                      onPress={() => handleResolveTask(task.id)}
+                      style={{ backgroundColor: WORKER_SUCCESS, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 4 }}
+                    >
+                      <Text style={{ color: '#000', fontSize: 12, fontWeight: 'bold' }}>RESOLVE</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               </View>
-
-              <View style={{ backgroundColor: BG, borderRadius: 12, padding: 12, marginBottom: 16, borderWidth: 1, borderColor: BORDER }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                  <MaterialIcons name="location-on" size={16} color={PRIMARY} />
-                  <Text style={{ color: TEXT, fontSize: 14, marginLeft: 6, fontWeight: '600' }}>{task.location}</Text>
-                </View>
-                <Text style={{ color: TEXT2, fontSize: 14, lineHeight: 20 }}>{task.description}</Text>
-              </View>
-
-              {activeTab === 'assigned' && (
-                <TouchableOpacity 
-                  onPress={() => handleUpdateStatus(task.id, 'in_progress')}
-                  style={{ backgroundColor: PRIMARY, borderRadius: 12, paddingVertical: 14, alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}
-                >
-                  <MaterialIcons name="play-arrow" size={20} color="#fff" style={{ marginRight: 8 }} />
-                  <Text style={{ color: '#fff', fontSize: 15, fontWeight: 'bold' }}>Accept & Start Work</Text>
-                </TouchableOpacity>
-              )}
-
-              {activeTab === 'active' && (
-                <TouchableOpacity 
-                  onPress={() => handleUpdateStatus(task.id, 'resolved')}
-                  style={{ backgroundColor: SUCCESS, borderRadius: 12, paddingVertical: 14, alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}
-                >
-                  <MaterialIcons name="check" size={20} color="#fff" style={{ marginRight: 8 }} />
-                  <Text style={{ color: '#fff', fontSize: 15, fontWeight: 'bold' }}>Mark as Resolved</Text>
-                </TouchableOpacity>
-              )}
-
-              {activeTab === 'completed' && (
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 8 }}>
-                  <MaterialIcons name="check-circle" size={20} color={SUCCESS} />
-                  <Text style={{ color: SUCCESS, fontSize: 14, fontWeight: 'bold', marginLeft: 8 }}>Task Completed Successfully</Text>
-                </View>
-              )}
             </View>
           ))
         )}
       </ScrollView>
 
-      {/* Floating Action for Support */}
-      <TouchableOpacity style={{ position: 'absolute', bottom: 30, right: 20, width: 60, height: 60, borderRadius: 30, backgroundColor: SECONDARY, justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 6, elevation: 8 }}>
-        <MaterialIcons name="headset-mic" size={28} color="#fff" />
+      {/* Emergency SOS */}
+      <TouchableOpacity style={{ position: 'absolute', bottom: 30, right: 20, width: 60, height: 60, borderRadius: 4, backgroundColor: WORKER_DANGER, justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 8, elevation: 10, borderWidth: 1, borderColor: '#fff' }}>
+        <MaterialIcons name="emergency" size={28} color="#fff" />
+        <Text style={{ color: '#fff', fontSize: 8, fontWeight: 'bold' }}>SOS</Text>
       </TouchableOpacity>
     </View>
   );
