@@ -6,7 +6,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer, NavigationIndependentTree } from '@react-navigation/native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { AppProvider, BG, CARD, BORDER, DANGER, PRIMARY, TEXT2, TAB_MENU_HEIGHT } from './core';
+import { AppProvider, useApp, BG, CARD, BORDER, DANGER, PRIMARY, SUCCESS, TEXT2, TAB_MENU_HEIGHT } from './core';
 import HomeScreen from './HomeScreen';
 import ComplaintsScreen from './ComplaintsScreen';
 import SOSScreen from './SOSScreen';
