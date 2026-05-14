@@ -65,7 +65,7 @@ export default function FeedScreen({ navigation }) {
   const appCtx = useApp();
   const { theme = { bg: '#0F172A', card: '#1E293B' }, userName = 'User' } = appCtx;
   
-  const [tab, setTab] = useState('trending');
+  const [tab, setTab] = useState('announcements');
   const [upvoted, setUpvoted] = useState({});
   const [counts, setCounts] = useState(FEED_SEED.reduce((acc, f) => { acc[f.id] = f.upvotes; return acc; }, {}));
   const [commentModal, setCommentModal] = useState({ visible: false, postId: null });
@@ -104,7 +104,13 @@ export default function FeedScreen({ navigation }) {
     }, 1200);
   };
 
-  const TABS = [{ key: 'trending', label: 'Trending' }, { key: 'announcements', label: 'Updates' }];
+  const filteredFeed = useMemo(() => {
+    if (tab === 'announcements') return feedItems.filter(f => f.type === 'announcement' || f.type === 'update' || f.type === 'complaint_ref');
+    if (tab === 'discussions') return feedItems.filter(f => f.type === 'discussion' || f.type === 'positive');
+    return feedItems;
+  }, [tab, feedItems]);
+
+  const TABS = [{ key: 'announcements', label: 'Updates' }, { key: 'discussions', label: 'Discussions' }];
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.bg }}>
@@ -122,7 +128,7 @@ export default function FeedScreen({ navigation }) {
       </View>
 
       <FlatList
-        data={feedItems}
+        data={filteredFeed}
         keyExtractor={item => item.id}
         contentContainerStyle={{ padding: 20, paddingBottom: 100 }}
         ListHeaderComponent={<AdvancedFeedHeader onOpenActions={() => setShowActions(true)} />}
