@@ -3,7 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, Platform, StyleSheet } from '
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useQuery, useMutation } from 'platform-hooks';
+import { useQuery, useMutation } from '../platform-hooks';
 import { 
   PRIMARY, ACCENT, BG, CARD, SUCCESS, WARNING, DANGER, SECONDARY, TEXT, TEXT2, BORDER, 
   SEED_COMPLAINTS, WORKERS, getPriorityColor, getStatusLabel, formatTime, getCategoryInfo, useApp 
