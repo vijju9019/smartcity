@@ -7,7 +7,7 @@ import { PRIMARY, ACCENT, BG, CARD, SUCCESS, WARNING, DANGER, SECONDARY, TEXT, T
 const TYPE_COLORS = { complaint_ref: DANGER, positive: SUCCESS, announcement: ACCENT, update: SECONDARY, discussion: PRIMARY };
 const TYPE_ICONS = { complaint_ref: 'report-problem', positive: 'thumb-up', announcement: 'campaign', update: 'update', discussion: 'forum' };
 
-const PostItem = React.memo(({ post, upvoted, counts, onUpvote, onComment, onDetail, formatTime, commentsCount }) => {
+const PostItem = React.memo(function PostItem({ post, upvoted, counts, onUpvote, onComment, onDetail, formatTime, commentsCount }) {
   const tc = TYPE_COLORS[post.type] || PRIMARY;
   const ti = TYPE_ICONS[post.type] || 'forum';
   const isUp = upvoted[post.id];
@@ -53,7 +53,7 @@ const AdvancedFeedHeader = ({ onOpenActions }) => (
       </View>
       <View style={{ flex: 1 }}>
         <Text style={{ color: TEXT, fontSize: 16, fontWeight: 'bold' }}>Colony Pulse</Text>
-        <Text style={{ color: TEXT2, fontSize: 13 }}>Post an update, event or see what's new</Text>
+        <Text style={{ color: TEXT2, fontSize: 13 }}>{"Post an update, event or see what's new"}</Text>
       </View>
       <MaterialIcons name="chevron-right" size={24} color={TEXT2} />
     </TouchableOpacity>

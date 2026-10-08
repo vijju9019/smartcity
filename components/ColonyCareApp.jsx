@@ -23,7 +23,6 @@ import LoginScreen from './LoginScreen';
 import WorkersScreen from './WorkersScreen';
 import ColonyEventsScreen from './ColonyEventsScreen';
 import MyTasksScreen from './MyTasksScreen';
-import { useApp } from './core';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();

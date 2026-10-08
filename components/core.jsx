@@ -11,7 +11,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useQuery, useMutation, useCamera, useLocation, useShare, useMaps, useFilePicker } from 'platform-hooks';
+import { useQuery, useMutation, useCamera, useLocation, useShare, useMaps, useFilePicker } from '../platform-hooks';
 
 // ─── Theme ───────────────────────────────────────────────────────────────────
 export const PRIMARY = '#2563EB';

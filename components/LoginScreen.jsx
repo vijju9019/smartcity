@@ -164,7 +164,7 @@ export default function LoginScreen({ navigation }) {
               onPress={() => navigation.navigate('Signup')}
               style={{ marginTop: 20, alignItems: 'center' }}
             >
-              <Text style={{ color: TEXT2, fontSize: 13 }}>Don't have an account? <Text style={{ color: PRIMARY, fontWeight: 'bold' }}>Sign up</Text></Text>
+              <Text style={{ color: TEXT2, fontSize: 13 }}>{"Don't have an account? "} <Text style={{ color: PRIMARY, fontWeight: 'bold' }}>Sign up</Text></Text>
             </TouchableOpacity>
           </View>
         </View>
